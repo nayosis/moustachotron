@@ -1,151 +1,145 @@
-# Déployer Le Moustachotron sur Raitchu
+# Déployer Le Moustachotron sur Raitchu (Dockge)
 
-Raitchu récupère l'image Docker publiée par GitHub (ghcr.io) depuis un **dépôt privé** : l'image est donc privée
-aussi, et Raitchu doit s'authentifier pour la télécharger. Ce guide va du code sur ton PC jusqu'à l'appli en HTTPS.
-
-> Dépôt : https://github.com/nayosis/moustachotron (privé) ; image : `ghcr.io/nayosis/moustachotron`.
+Dépôt privé : https://github.com/nayosis/moustachotron. Serveur : Raitchu, avec **Dockge**. Adresse :
+**https://moustachotron.gouadon.fr**.
 
 ## Vue d'ensemble
 
 ```
-PC (code) ──git push + étiquette v0.4.0──► GitHub (dépôt privé)
-                                              │ Actions « Publication » : tests, image amd64 + arm64
+PC (code) ──git push + étiquette v0.4.0──► GitHub (dépôt privé, Actions : tests)
+                                              │ clé de déploiement (SSH, lecture seule, ce dépôt seulement)
                                               ▼
-                                     ghcr.io/nayosis/moustachotron  (paquet privé)
-                                              │ docker login (jeton « read:packages »)
+                     Raitchu : /opt/stacks/moustachotron/src  (git fetch + checkout v0.4.0)
+                                              │ docker compose up -d --build  (pile Dockge)
                                               ▼
-                                    Raitchu : docker compose pull && up -d
-                                              │ port 3000
-                                              ▼
-                              reverse proxy HTTPS ──► https://moustachotron.gouadon.fr
+                     conteneur moustachotron (127.0.0.1:3000, données dans ./data)
+                                              │
+                     reverse proxy HTTPS ──► https://moustachotron.gouadon.fr
 ```
 
-## 1. Une seule fois : mettre le code sur GitHub
+**Pourquoi une clé de déploiement** : elle ne donne accès qu'à **ce dépôt**, en **lecture seule**, et ne dépend
+d'aucun compte personnel ni jeton à renouveler. Elle ne permet pas de lire le registre d'images ghcr.io : Raitchu
+**construit donc l'image lui-même** à partir du code (une à deux minutes à chaque mise à jour). L'autre voie — image
+construite par GitHub et téléchargée avec un jeton — est décrite en annexe.
 
-Sur le PC, dans `D:\dev\src\rc-tools` :
+## 1. Sur le PC : publier une version
 
-1. Vérifier que rien de privé ne part : `.gitignore` exclut `data/` (ta base réelle), `.env` (mot de passe de
-   test) et `docs/sources/` (tableurs et rapports du client). Le contrôler avant chaque premier envoi :
+Le code est sur GitHub (branche `main`). Une **version** est une étiquette `vX.Y.Z` égale à la version de
+`package.json` (le CHANGELOG dit ce qu'elle contient) :
 
 ```powershell
-git status --short
+git push
 ```
-
-   La liste ne doit contenir **ni** `data/`, **ni** `.env`, **ni** `docs/sources/`.
-
-2. Premier envoi (GitHub demandera de te connecter dans le navigateur la première fois) :
-
-```powershell
-git commit -m "Le Moustachotron 0.4.0"
-```
-
-```powershell
-git branch -M main; git remote add origin https://github.com/nayosis/moustachotron.git; git push -u origin main
-```
-
-## 2. Publier une version (à chaque mise à jour)
-
-L'image est construite par GitHub quand une **étiquette** `vX.Y.Z` égale à la version de `package.json` est poussée
-(workflow `.github/workflows/publication.yml` : tests, image multi-architecture, release).
 
 ```powershell
 git tag v0.4.0; git push origin v0.4.0
 ```
 
-Suivre l'onglet **Actions** du dépôt. Au premier succès, le paquet apparaît dans GitHub → ton profil → **Packages**
-→ `moustachotron`. Il est **privé** comme le dépôt : c'est voulu.
+Attendre que l'onglet **Actions** du dépôt soit vert (tests). Avant chaque nouvelle version : augmenter `version` dans
+`package.json` et compléter `CHANGELOG.md`.
 
-> `package.json` est en 0.4.0 : à chaque version, l'augmenter (et le CHANGELOG) avant l'étiquette, sinon le workflow
-> s'arrête à « L'étiquette correspond à package.json ».
+> L'étiquette déclenche aussi le workflow « Publication », qui pousse une image sur ghcr.io : inutile avec la clé de
+> déploiement, mais sans conséquence (et prête si tu passes un jour à l'annexe A).
 
-## 3. Une seule fois : donner à Raitchu le droit de télécharger l'image
+## 2. Une seule fois : la clé de déploiement
 
-### 3.1 Créer un jeton en lecture seule
-
-GitHub → **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)** →
-**Generate new token (classic)** :
-
-- Note : `Raitchu – lecture ghcr` ;
-- Expiration : 1 an (noter la date : il faudra le renouveler) ;
-- Portée : **uniquement `read:packages`** (rien d'autre : ce jeton ne peut ni lire le code, ni publier).
-
-Copier le jeton (`ghp_…`) : il ne s'affiche qu'une fois. Les jetons « fine-grained » ne gèrent pas encore bien le
-registre de conteneurs : prendre un jeton *classic*.
-
-### 3.2 Se connecter au registre depuis Raitchu
-
-En SSH sur Raitchu (le jeton est lu au clavier, il ne reste pas dans l'historique du shell) :
+Sur Raitchu, en SSH, **avec l'utilisateur qui gère les piles Dockge** (souvent `root`, car `/opt/stacks` lui
+appartient ; sinon adapter les chemins) :
 
 ```bash
-read -s GHCR_TOKEN && echo "$GHCR_TOKEN" | docker login ghcr.io -u nayosis --password-stdin && unset GHCR_TOKEN
+sudo -i
+ssh-keygen -t ed25519 -N "" -C "raitchu – moustachotron (lecture)" -f /root/.ssh/moustachotron_deploy
+cat /root/.ssh/moustachotron_deploy.pub
 ```
 
-« Login Succeeded » : Docker garde l'accès dans `~/.docker/config.json` (de l'utilisateur qui lance
-`docker compose`). Le protéger : `chmod 600 ~/.docker/config.json`.
+Sur GitHub : dépôt `moustachotron` → **Settings** → **Deploy keys** → **Add deploy key** :
+- Title : `Raitchu (lecture)` ;
+- Key : coller la ligne `ssh-ed25519 …` affichée ;
+- **ne pas cocher** « Allow write access ».
 
-- **Portainer** : *Registries* → *Add registry* → *Custom* → URL `ghcr.io`, authentification avec `nayosis` et le
-  jeton ; puis choisir ce registre dans la pile.
-- **Synology Container Manager** : *Registre* → *Paramètres* → *Ajouter* → `https://ghcr.io`, nom d'utilisateur et
-  jeton.
-- **Docker lancé en root (sudo)** : faire le `docker login` avec `sudo` aussi, sinon `pull` ne verra pas l'accès.
-
-## 4. Installer sur Raitchu
+Toujours sur Raitchu, un alias SSH pour que Git utilise cette clé-là (et seulement pour ce dépôt) :
 
 ```bash
-sudo mkdir -p /opt/moustachotron && sudo chown "$USER" /opt/moustachotron && cd /opt/moustachotron
+cat >> /root/.ssh/config <<'EOF'
+Host github-moustachotron
+    HostName github.com
+    User git
+    IdentityFile /root/.ssh/moustachotron_deploy
+    IdentitiesOnly yes
+EOF
+chmod 600 /root/.ssh/config /root/.ssh/moustachotron_deploy
+ssh -T github-moustachotron
 ```
 
-Copier `docker-compose.yml` du dépôt dans ce dossier (ou `curl` avec le jeton, le fichier étant privé), puis créer
-`/opt/moustachotron/.env` :
+La dernière commande répond « Hi nayosis/moustachotron! You've successfully authenticated… » (accepter l'empreinte
+de github.com à la première connexion).
+
+## 3. Une seule fois : la pile Dockge
+
+Dockge range ses piles dans `/opt/stacks` (vérifier le dossier choisi à son installation, variable
+`DOCKGE_STACKS_DIR`). Récupérer le code dans la future pile :
 
 ```bash
+mkdir -p /opt/stacks/moustachotron && cd /opt/stacks/moustachotron
+git clone git@github-moustachotron:nayosis/moustachotron.git src
+cp src/docker/dockge/compose.yaml compose.yaml
+cp src/docker/dockge/mettre-a-jour.sh mettre-a-jour.sh && chmod +x mettre-a-jour.sh
 cat > .env <<'EOF'
-# Version de l'image : « latest », ou « 0.4 » pour rester sur les 0.4.x.
-APP_VERSION=latest
+APP_VERSION=0.4.0
 APP_PORT=3000
 TZ=Europe/Paris
-# Dépôt privé : la vérification des nouvelles versions sur GitHub échouerait sans jeton → désactivée.
-APP_VERIFIER_MISES_A_JOUR=non
 APP_SAUVEGARDES_CONSERVEES=14
 EOF
 chmod 600 .env
+./mettre-a-jour.sh v0.4.0
 ```
 
-Lancer :
+Le premier lancement construit l'image (une à deux minutes), applique les migrations et démarre le conteneur.
 
-```bash
-docker compose pull && docker compose up -d && docker compose logs -f --tail=50
+Dans **Dockge**, la pile `moustachotron` apparaît (sinon : bouton *Scan Stacks Folder*). On y voit l'état, les
+journaux, et on peut arrêter / relancer. Le fichier `compose.yaml` et le `.env` y sont modifiables ; ne pas y coller
+de mot de passe d'administrateur si l'écran de création au premier lancement suffit.
+
+Contrôle sur Raitchu : `curl -s http://127.0.0.1:3000/api/sante` → `{"ok":true,"version":"0.4.0"}`.
+
+Arborescence obtenue :
+
+```
+/opt/stacks/moustachotron/
+├── compose.yaml          pile Dockge (construit l'image depuis ./src)
+├── .env                  version, port, fuseau
+├── mettre-a-jour.sh      passer à une autre version
+├── src/                  code (clé de déploiement, lecture seule)
+└── data/                 base, fichiers, sauvegardes de la nuit  ← à sauvegarder
 ```
 
-Les logs affichent « Migrations appliquées… » puis l'adresse. `http://raitchu:3000` doit répondre (créer alors le
-compte administrateur à l'écran, ou le définir dans `.env` avec `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_MOT_DE_PASSE`).
+## 4. HTTPS sur moustachotron.gouadon.fr
 
-## 5. HTTPS sur moustachotron.gouadon.fr (obligatoire pour le téléphone hors ligne et les notifications)
+L'application installée sur le téléphone, le hors ligne et les notifications n'existent qu'en **HTTPS**.
 
-L'application installée sur le téléphone, le hors ligne (phase 3b) et les notifications n'existent qu'en **HTTPS**.
-Adresse retenue : **https://moustachotron.gouadon.fr**.
+### 4.1 DNS
 
-### 5.1 DNS
-
-Chez le registrar de `gouadon.fr` (zone DNS), créer l'enregistrement qui mène à Raitchu :
+Zone DNS de `gouadon.fr` chez le registrar :
 
 | Type | Nom | Valeur |
 |---|---|---|
 | `A` | `moustachotron` | adresse IPv4 publique de la box / de Raitchu |
 | `AAAA` (si IPv6) | `moustachotron` | adresse IPv6 publique de Raitchu |
 
-Ou, si `raitchu.gouadon.fr` existe déjà : `CNAME moustachotron → raitchu.gouadon.fr.`. Vérifier depuis le PC :
+Ou `CNAME moustachotron → raitchu.gouadon.fr.` si ce nom existe déjà. Vérifier depuis le PC :
 
 ```powershell
 Resolve-DnsName moustachotron.gouadon.fr
 ```
 
-Raitchu derrière une box : rediriger les ports **80 et 443** de la box vers Raitchu (le 80 sert au certificat Let's
-Encrypt). Adresse IP publique qui change : un DNS dynamique chez le registrar (ou `ddclient` sur Raitchu).
+Raitchu derrière une box : rediriger les ports **80 et 443** vers Raitchu (le 80 sert au certificat Let's Encrypt).
+IP publique qui change : DNS dynamique chez le registrar (ou `ddclient`).
 
-### 5.2 Reverse proxy
+### 4.2 Reverse proxy
 
-**Caddy** (le plus simple : certificat obtenu et renouvelé tout seul). `/etc/caddy/Caddyfile` :
+Le conteneur n'écoute que sur `127.0.0.1:3000` (voir `compose.yaml`) : seul le reverse proxy de Raitchu y accède.
+
+**Caddy** (certificat obtenu et renouvelé tout seul) — `/etc/caddy/Caddyfile` :
 
 ```
 moustachotron.gouadon.fr {
@@ -158,64 +152,81 @@ moustachotron.gouadon.fr {
 ```
 
 ```bash
-sudo systemctl reload caddy && curl -I https://moustachotron.gouadon.fr/api/sante
+systemctl reload caddy && curl -I https://moustachotron.gouadon.fr/api/sante
 ```
 
-**nginx** (s'il tourne déjà sur Raitchu) : partir de `docker/nginx-exemple.conf` en remplaçant `app.example.org` par
-`moustachotron.gouadon.fr`, puis `sudo certbot --nginx -d moustachotron.gouadon.fr` pour le certificat.
+**nginx** : partir de `docker/nginx-exemple.conf` (remplacer `app.example.org` par `moustachotron.gouadon.fr`), puis
+`certbot --nginx -d moustachotron.gouadon.fr`.
 
-Le proxy étant sur Raitchu, n'exposer le conteneur qu'à la machine elle-même : dans `docker-compose.yml`, mapper le
-port en `"127.0.0.1:3000:3000"` (sinon `http://raitchu:3000` contournerait le HTTPS).
+**Proxy lui-même dans Dockge** (Caddy, Nginx Proxy Manager, Traefik en conteneur) : `127.0.0.1` désigne alors le
+conteneur du proxy, pas Raitchu. Mettre les deux piles sur un même réseau Docker et viser `moustachotron:3000`, ou
+viser l'adresse de Raitchu sur le pont Docker (`172.17.0.1:3000`) en publiant le port sur cette adresse.
 
-**Sans ouvrir de port** (alternative) : Tailscale sur Raitchu et le téléphone, `tailscale serve --bg 3000` →
-`https://raitchu.<tailnet>.ts.net`, accessible de tes seuls appareils (le domaine n'est alors pas utilisé).
-
-### 5.3 Contrôle
+### 4.3 Contrôle
 
 - `https://moustachotron.gouadon.fr` affiche la connexion, cadenas valide.
 - Sur le téléphone : ouvrir l'adresse, menu du navigateur → **Ajouter à l'écran d'accueil** (iPhone : Safari →
-  Partager → Sur l'écran d'accueil). L'appli s'ouvre alors en plein écran.
+  Partager → Sur l'écran d'accueil).
 
-## 6. Y mettre tes données actuelles
+## 5. Y mettre tes données actuelles
 
-La base de développement du PC contient la reprise des tableurs (mouvements, charges, chantiers). Pour la
-transférer :
+La base du PC contient la reprise des tableurs (mouvements, charges, chantiers) :
 
-1. Sur le PC (appli lancée) : menu **Sauvegarde** → **Télécharger une sauvegarde** (ZIP : base + fichiers).
-2. Sur Raitchu (connecté avec le compte super admin) : **Sauvegarde** → **Restaurer** → choisir le ZIP.
+1. Sur Raitchu, créer ton compte administrateur à l'écran (premier lancement).
+2. Sur le PC (appli lancée) : **Sauvegarde** → **Télécharger une sauvegarde** (ZIP : base + fichiers).
+3. Sur Raitchu : **Sauvegarde** → **Restaurer** → choisir le ZIP.
 
-Les comptes ne voyagent pas dans la sauvegarde (ils sont propres à chaque installation) : créer ton compte sur
-Raitchu avant de restaurer. Une fois Raitchu en service, c'est **lui** qui fait foi : ne plus saisir sur le PC.
+Les comptes ne voyagent pas dans la sauvegarde (propres à chaque installation). Ensuite, c'est **Raitchu** qui fait
+foi : ne plus saisir sur le PC.
 
-## 7. Mettre à jour
+## 6. Mettre à jour
 
-Après une nouvelle étiquette (§ 2) et la fin du workflow :
-
-```bash
-cd /opt/moustachotron && docker compose pull && docker compose up -d
-```
-
-Les migrations s'appliquent au démarrage ; une sauvegarde de la nuit précédente est toujours dans
-`data/sauvegardes`. Pour revenir en arrière : `APP_VERSION=0.4.0` dans `.env` puis la même commande (et restaurer la
-sauvegarde si une migration avait été appliquée).
-
-## 8. Sauvegardes
-
-- Une sauvegarde complète chaque nuit dans `/opt/moustachotron/data/sauvegardes` (14 gardées).
-- Copier ce dossier **hors de Raitchu** (NAS, disque externe, cloud chiffré) : une sauvegarde sur la même machine ne
-  protège pas d'une panne de disque. Exemple quotidien avec `rsync` dans la crontab de Raitchu :
+Après une nouvelle étiquette (§ 1, Actions vertes), sur Raitchu :
 
 ```bash
-0 4 * * * rsync -a --delete /opt/moustachotron/data/sauvegardes/ /mnt/sauvegardes/moustachotron/
+/opt/stacks/moustachotron/mettre-a-jour.sh v0.4.1
 ```
 
-## 9. Dépannage
+Revenir à la version précédente : `./mettre-a-jour.sh v0.4.0` (et restaurer la sauvegarde de la nuit si une
+migration a été appliquée entre-temps). Le bouton *Update* de Dockge ne suffit pas ici : il télécharge des images,
+il ne reconstruit pas depuis le code.
+
+## 7. Sauvegardes
+
+- Une sauvegarde complète chaque nuit dans `/opt/stacks/moustachotron/data/sauvegardes` (14 gardées).
+- La copier **hors de Raitchu** (NAS, disque externe, cloud chiffré), par exemple chaque jour :
+
+```bash
+0 4 * * * rsync -a --delete /opt/stacks/moustachotron/data/sauvegardes/ /mnt/sauvegardes/moustachotron/
+```
+
+## 8. Dépannage
 
 | Message | Cause probable | Solution |
 |---|---|---|
-| `denied` / `unauthorized` au `pull` | pas connecté au registre, jeton expiré, portée sans `read:packages`, `docker login` fait avec un autre utilisateur (sudo) | refaire § 3 avec le même utilisateur que `docker compose` |
-| `manifest unknown` | étiquette absente (workflow pas fini ou en échec), nom en majuscules | onglet Actions ; vérifier `ghcr.io/nayosis/moustachotron` en minuscules |
-| `no matching manifest for linux/arm…` | architecture | l'image est publiée en amd64 et arm64 : vérifier que le workflow est allé au bout |
-| page blanche, « verrou d'instance » dans les logs | deux conteneurs sur le même dossier `data` | `docker ps`, n'en garder qu'un |
-| téléphone : pas d'installation possible | site en HTTP | passer en HTTPS (§ 5) |
-| le jeton a expiré | — | en recréer un (§ 3.1), refaire `docker login` |
+| `Permission denied (publickey)` au `git` | clé non ajoutée au dépôt, alias SSH absent, autre utilisateur (sans `sudo -i`) | refaire § 2 avec le même utilisateur ; `ssh -T github-moustachotron` |
+| `ERROR: Repository not found` | URL sans l'alias (`git@github.com:` au lieu de `git@github-moustachotron:`) | `git -C src remote set-url origin git@github-moustachotron:nayosis/moustachotron.git` |
+| `error: pathspec 'v0.4.1' did not match` | étiquette pas encore poussée | `git push origin v0.4.1` sur le PC |
+| construction lente ou interrompue (mémoire) | petite machine | fermer d'autres piles pendant la construction ; ou annexe A (image construite par GitHub) |
+| page blanche, « verrou d'instance » dans les journaux | deux conteneurs sur le même `data/` | dans Dockge, n'en garder qu'un |
+| 502 du reverse proxy | conteneur arrêté, ou proxy dans un conteneur visant `127.0.0.1` | journaux Dockge ; § 4.2, cas du proxy dans Dockge |
+| téléphone : pas d'installation possible | site en HTTP | § 4 |
+
+## Annexe A — Image construite par GitHub (ghcr.io) avec un jeton
+
+À préférer si Raitchu est trop juste pour construire l'image, ou pour ne plus avoir le code sur le serveur.
+
+1. GitHub → **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)** : portée
+   **uniquement `read:packages`**, expiration 1 an. (Le registre ghcr.io n'accepte pas les clés de déploiement, et
+   gère mal les jetons *fine-grained*.)
+2. Dockge exécute `docker compose` **depuis son propre conteneur** : c'est là qu'il faut se connecter au registre.
+
+```bash
+docker exec -it dockge docker login ghcr.io -u nayosis
+```
+
+   (coller le jeton quand le mot de passe est demandé). Pour que la connexion survive à une recréation de Dockge,
+   monter `/root/.docker` du conteneur Dockge sur un dossier de Raitchu dans la pile de Dockge.
+3. Dans `compose.yaml`, remplacer le bloc `build:` et la ligne `image:` par
+   `image: ghcr.io/nayosis/moustachotron:${APP_VERSION:-latest}`. Les mises à jour se font alors avec le bouton
+   *Update* de Dockge (ou `docker compose pull && docker compose up -d`).

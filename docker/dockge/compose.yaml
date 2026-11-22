@@ -1,0 +1,26 @@
+# Pile Dockge « moustachotron » (docs/deploiement-raitchu.md) : l'image est construite sur le serveur à partir du code
+# récupéré avec la clé de déploiement (dossier ./src, à côté de ce fichier). Les données vivent dans ./data.
+services:
+  moustachotron:
+    build:
+      context: ./src
+      args:
+        # Version affichée dans l'application (mise à jour par mettre-a-jour.sh).
+        VERSION: ${APP_VERSION:-dev}
+    image: moustachotron:${APP_VERSION:-dev}
+    container_name: moustachotron
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Europe/Paris}
+      # Dépôt privé : la vérification des nouvelles versions sur GitHub échouerait sans jeton.
+      APP_VERIFIER_MISES_A_JOUR: "non"
+      APP_SAUVEGARDES_CONSERVEES: ${APP_SAUVEGARDES_CONSERVEES:-14}
+      # Facultatif : sans ces deux variables, le compte administrateur se crée à l'écran au premier lancement.
+      SUPER_ADMIN_EMAIL: ${SUPER_ADMIN_EMAIL:-}
+      SUPER_ADMIN_MOT_DE_PASSE: ${SUPER_ADMIN_MOT_DE_PASSE:-}
+    volumes:
+      - ./data:/data
+    ports:
+      # Joignable seulement depuis Raitchu : le reverse proxy HTTPS (moustachotron.gouadon.fr) passe par ici.
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
+    # État de santé : défini dans le Dockerfile (/api/sante), visible dans Dockge.

@@ -12,7 +12,8 @@ téléphone **hors ligne**. Construit sur le socle Fundamentum (comptes, journal
 - `docs/architecture-hors-ligne.md` : la dérogation au socle (hors ligne) et son fonctionnement.
 - `docs/analyse-tableurs.md` : ce que faisaient les tableurs Excel qu'on remplace.
 - `docs/rapport-de-visite.md` : structure du compte rendu de chantier (PDF) à reproduire.
-- `docs/deploiement-raitchu.md` : publication de l'image (ghcr.io privé) et installation sur le serveur Raitchu.
+- `docs/deploiement-raitchu.md` : installation sur le serveur Raitchu (Dockge, clé de déploiement, HTTPS) ; fichiers de
+  la pile dans `docker/dockge/`.
 - Skills du projet (`.claude/skills/`) :
   - `cadrage` : discuter et remplir / faire évoluer la conception ;
   - `architecture` : principes du socle (RPC, journal, droits, fichiers, sauvegardes, notifications) ;
