@@ -6,6 +6,26 @@ import { aujourdhui } from "../src/lib/dates";
 import { cleReleve, lireNombre, lireReleve, modeDuLibelle, motsCles } from "../src/lib/releve";
 import { SUPER, serveurDeTest } from "./outils-serveur";
 
+// Serveur de test au niveau du fichier (pas dans un describe asynchrone : Bun ne l'attend pas, les tests déclarés
+// après l'await ne seraient pas enregistrés et la base resterait ouverte pendant le fichier suivant).
+const s = await serveurDeTest();
+const { cookie } = await s.connexion(SUPER.email, SUPER.motDePasse);
+const appel = async (nom: string, args: unknown[]) => {
+  const r = await s.rpc(nom, args, cookie);
+  const corps = await r.json();
+  return { statut: r.status, resultat: corps.resultat, erreur: corps.erreur as string | undefined };
+};
+const ok = async (nom: string, ...args: unknown[]) => {
+  const r = await appel(nom, args);
+  if (r.statut !== 200) throw new Error(`${nom} : ${r.statut} ${r.erreur}`);
+  return r.resultat;
+};
+const jour = (n: number) => {
+  const d = new Date(`${aujourdhui()}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+
 describe("lecture du CSV", () => {
   test("format débit / crédit avec titre avant les en-têtes, séparateur « ; », nombres à la française", () => {
     const csv = [
@@ -43,25 +63,7 @@ describe("lecture du CSV", () => {
   });
 });
 
-describe("import par l'API", async () => {
-  const s = await serveurDeTest();
-  const { cookie } = await s.connexion(SUPER.email, SUPER.motDePasse);
-  const appel = async (nom: string, args: unknown[]) => {
-    const r = await s.rpc(nom, args, cookie);
-    const corps = await r.json();
-    return { statut: r.status, resultat: corps.resultat, erreur: corps.erreur as string | undefined };
-  };
-  const ok = async (nom: string, ...args: unknown[]) => {
-    const r = await appel(nom, args);
-    if (r.statut !== 200) throw new Error(`${nom} : ${r.statut} ${r.erreur}`);
-    return r.resultat;
-  };
-  const jour = (n: number) => {
-    const d = new Date(`${aujourdhui()}T12:00:00Z`);
-    d.setUTCDate(d.getUTCDate() + n);
-    return d.toISOString().slice(0, 10);
-  };
-
+describe("import par l'API", () => {
   test("propositions : échéance encaissée, charge récurrente (mot-clé), catégorie apprise ; import rejouable sans doublon", async () => {
     // Une échéance d'acompte de 750 € (projet AMO, 60 000 € estimés, mission validée).
     const id = await ok("creerProjet", { intitule: "Maison", missionCode: "AMO", origineCode: "site", nouveauClient: { nom: "Famille Garnier" } });
