@@ -1,7 +1,7 @@
 {
   "name": "moustachotron",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.4.2",
   "description": "Le Moustachotron : Gestion d'un maître d'œuvre : trésorerie prévisionnelle, prospects et projets, suivi de chantier, utilisable sur téléphone hors ligne.",
   "license": "AGPL-3.0-or-later",
   "repository": "github:nayosis/moustachotron",

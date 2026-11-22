@@ -1,5 +1,19 @@
 # Journal des versions
 
+## v0.4.2 · Déploiement et correction de la base
+
+Reprend aussi le contenu de l'étiquette v0.4.1 (même code, numéro de version resté à 0.4.0).
+
+**Corrigé**
+- « database is locked » à la fermeture de la base sous Bun 1.3 (celui de l'image Docker) : la **restauration d'une
+  sauvegarde** échouait, et les tests sur GitHub Actions aussi. Les requêtes sont désormais libérées après usage.
+- Tests du relevé bancaire : serveur lancé au niveau du fichier.
+
+**Mise à jour**
+- Déploiement sur Raitchu avec **Dockge** et une **clé de déploiement** : l'image est construite sur le serveur
+  (`docker/dockge/`, `docs/deploiement-raitchu.md`). HTTPS sur moustachotron.gouadon.fr.
+- Pas de migration.
+
 ## v0.4.0 · Suivi de chantier
 
 **Nouveau**

@@ -6,10 +6,10 @@ Dépôt privé : https://github.com/nayosis/moustachotron. Serveur : Raitchu, av
 ## Vue d'ensemble
 
 ```
-PC (code) ──git push + étiquette v0.4.0──► GitHub (dépôt privé, Actions : tests)
+PC (code) ──git push + étiquette v0.4.2──► GitHub (dépôt privé, Actions : tests)
                                               │ clé de déploiement (SSH, lecture seule, ce dépôt seulement)
                                               ▼
-                     Raitchu : /opt/stacks/moustachotron/src  (git fetch + checkout v0.4.0)
+                     Raitchu : /opt/stacks/moustachotron/src  (git fetch + checkout v0.4.2)
                                               │ docker compose up -d --build  (pile Dockge)
                                               ▼
                      conteneur moustachotron (127.0.0.1:3000, données dans ./data)
@@ -32,7 +32,7 @@ git push
 ```
 
 ```powershell
-git tag v0.4.0; git push origin v0.4.0
+git tag v0.4.2; git push origin v0.4.2
 ```
 
 Attendre que l'onglet **Actions** du dépôt soit vert (tests). Avant chaque nouvelle version : augmenter `version` dans
@@ -85,13 +85,13 @@ git clone git@github-moustachotron:nayosis/moustachotron.git src
 cp src/docker/dockge/compose.yaml compose.yaml
 cp src/docker/dockge/mettre-a-jour.sh mettre-a-jour.sh && chmod +x mettre-a-jour.sh
 cat > .env <<'EOF'
-APP_VERSION=0.4.0
+APP_VERSION=0.4.2
 APP_PORT=3000
 TZ=Europe/Paris
 APP_SAUVEGARDES_CONSERVEES=14
 EOF
 chmod 600 .env
-./mettre-a-jour.sh v0.4.0
+./mettre-a-jour.sh v0.4.2
 ```
 
 Le premier lancement construit l'image (une à deux minutes), applique les migrations et démarre le conteneur.
@@ -100,7 +100,7 @@ Dans **Dockge**, la pile `moustachotron` apparaît (sinon : bouton *Scan Stacks 
 journaux, et on peut arrêter / relancer. Le fichier `compose.yaml` et le `.env` y sont modifiables ; ne pas y coller
 de mot de passe d'administrateur si l'écran de création au premier lancement suffit.
 
-Contrôle sur Raitchu : `curl -s http://127.0.0.1:3000/api/sante` → `{"ok":true,"version":"0.4.0"}`.
+Contrôle sur Raitchu : `curl -s http://127.0.0.1:3000/api/sante` → `{"ok":true,"version":"0.4.2"}`.
 
 Arborescence obtenue :
 
@@ -184,10 +184,10 @@ foi : ne plus saisir sur le PC.
 Après une nouvelle étiquette (§ 1, Actions vertes), sur Raitchu :
 
 ```bash
-/opt/stacks/moustachotron/mettre-a-jour.sh v0.4.1
+/opt/stacks/moustachotron/mettre-a-jour.sh v0.4.3
 ```
 
-Revenir à la version précédente : `./mettre-a-jour.sh v0.4.0` (et restaurer la sauvegarde de la nuit si une
+Revenir à la version précédente : `./mettre-a-jour.sh v0.4.2` (et restaurer la sauvegarde de la nuit si une
 migration a été appliquée entre-temps). Le bouton *Update* de Dockge ne suffit pas ici : il télécharge des images,
 il ne reconstruit pas depuis le code.
 
@@ -206,7 +206,7 @@ il ne reconstruit pas depuis le code.
 |---|---|---|
 | `Permission denied (publickey)` au `git` | clé non ajoutée au dépôt, alias SSH absent, autre utilisateur (sans `sudo -i`) | refaire § 2 avec le même utilisateur ; `ssh -T github-moustachotron` |
 | `ERROR: Repository not found` | URL sans l'alias (`git@github.com:` au lieu de `git@github-moustachotron:`) | `git -C src remote set-url origin git@github-moustachotron:nayosis/moustachotron.git` |
-| `error: pathspec 'v0.4.1' did not match` | étiquette pas encore poussée | `git push origin v0.4.1` sur le PC |
+| `error: pathspec 'v0.4.3' did not match` | étiquette pas encore poussée | `git push origin v0.4.3` sur le PC |
 | construction lente ou interrompue (mémoire) | petite machine | fermer d'autres piles pendant la construction ; ou annexe A (image construite par GitHub) |
 | page blanche, « verrou d'instance » dans les journaux | deux conteneurs sur le même `data/` | dans Dockge, n'en garder qu'un |
 | 502 du reverse proxy | conteneur arrêté, ou proxy dans un conteneur visant `127.0.0.1` | journaux Dockge ; § 4.2, cas du proxy dans Dockge |
