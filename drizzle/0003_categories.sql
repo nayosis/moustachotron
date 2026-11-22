@@ -1,0 +1,62 @@
+-- Catégories de trésorerie reprises des tableurs (« Tableau de gestion », onglets mensuels et synthèses) et réglages
+-- du prévisionnel. Aucun montant réel ici : la migration est publique, les données du client restent dans sa base.
+INSERT INTO `categorie` (`id`, `libelle`, `groupe`, `sens`, `tva_pb`, `ordre`, `archive`) VALUES
+('expertise', 'Expertise', 'Société de conseil', 'recette', 2000, 10, 0),
+('apport_recu', 'Apport d''affaires reçu', 'Société de conseil', 'recette', 2000, 11, 0),
+('hono_amo', 'Honoraires AMO', 'Réseau', 'recette', 1000, 20, 0),
+('hono_moe', 'Honoraires MOE', 'Réseau', 'recette', 1000, 21, 0),
+('courtage', 'Courtage', 'Réseau', 'recette', 1000, 22, 0),
+('eaa', 'EAA', 'Réseau', 'recette', 2000, 23, 0),
+('commission_edb', 'Commission EDB', 'Réseau', 'recette', 2000, 24, 0),
+('audit', 'Audits énergétiques', 'Réseau', 'recette', 2000, 25, 1),
+('autre_recette', 'Autre recette', 'Divers', 'recette', 2000, 29, 0),
+('tva', 'TVA versée ou remboursée', 'TVA', 'tva', 0, 30, 0),
+('financement', 'Prêt, compte courant d''associé', 'Financement', 'financement', 0, 40, 0),
+('franchise_redevance', 'Frais de franchise (redevance fixe)', 'Franchise', 'depense', 2000, 100, 0),
+('pub_mutualisee', 'Publicité mutualisée', 'Franchise', 'depense', 2000, 101, 0),
+('pub_nationale', 'Participation publicité nationale', 'Franchise', 'depense', 2000, 102, 0),
+('redevance_ca', 'Redevance sur CA', 'Franchise', 'depense', 2000, 103, 0),
+('apport_affaires', 'Commission d''apport d''affaires', 'Franchise', 'depense', 2000, 104, 0),
+('redevance_assurance', 'Redevance assurance', 'Franchise', 'depense', 2000, 105, 0),
+('formation', 'Formations, réunions', 'Franchise', 'depense', 2000, 106, 0),
+('pub_locale', 'Publicité locale', 'Communication', 'depense', 2000, 110, 0),
+('frais_bancaires', 'Frais bancaires', 'Banque', 'depense', 0, 120, 0),
+('emprunt', 'Remboursement d''emprunt', 'Banque', 'depense', 0, 121, 0),
+('comptable', 'Frais de comptabilité', 'Comptabilité', 'depense', 2000, 130, 0),
+('frais_societe', 'Frais de société', 'Comptabilité', 'depense', 2000, 131, 0),
+('loyer', 'Loyer', 'Local', 'depense', 2000, 140, 0),
+('travaux_local', 'Travaux du local', 'Local', 'depense', 2000, 141, 0),
+('energie', 'Électricité', 'Local', 'depense', 2000, 142, 0),
+('eau', 'Eau', 'Local', 'depense', 550, 143, 0),
+('telephonie', 'Téléphonie', 'Local', 'depense', 2000, 144, 0),
+('loa', 'LOA véhicule', 'Véhicule', 'depense', 2000, 150, 0),
+('carburant', 'Carburant, recharge', 'Véhicule', 'depense', 2000, 151, 0),
+('transport', 'Frais de transport, péages', 'Véhicule', 'depense', 2000, 152, 0),
+('assurances', 'Assurances', 'Assurances', 'depense', 0, 160, 0),
+('agence', 'Agence', 'Frais divers', 'depense', 2000, 170, 0),
+('bureautique', 'Bureautique', 'Frais divers', 'depense', 2000, 171, 0),
+('restauration', 'Hébergement et restauration', 'Frais divers', 'depense', 1000, 172, 0),
+('adhesions', 'Adhésions', 'Frais divers', 'depense', 0, 173, 0),
+('informatique', 'Informatique et téléphone', 'Frais divers', 'depense', 2000, 174, 0),
+('logiciels', 'Logiciels', 'Frais divers', 'depense', 2000, 175, 0),
+('outillage', 'Outillage', 'Frais divers', 'depense', 2000, 176, 0),
+('salaire', 'Salaire', 'Salaire et mutuelle', 'depense', 0, 180, 0),
+('charges_sociales', 'Charges sociales, retraite', 'Salaire et mutuelle', 'depense', 0, 181, 0),
+('mutuelle', 'Mutuelle', 'Salaire et mutuelle', 'depense', 0, 182, 0),
+('impots', 'Impôts et taxes (CFE…)', 'Impôts et taxes', 'depense', 0, 190, 0),
+('autre_depense', 'Autre dépense', 'Divers', 'depense', 2000, 199, 0);
+--> statement-breakpoint
+INSERT INTO `parametre` (`cle`, `valeur`) VALUES
+('horizons_jours', '[0, 30, 90]'),
+('tva_jour', '25'),
+('redevance_ca_pb', '500'),
+('redevance_ca_jour', '15'),
+('redevance_assurance_pb', '{"COU": 50, "AMO": 300, "MOE": 750}'),
+('proba_avant_devis_pb', '5000'),
+('mois_debut_exercice', '6');
+--> statement-breakpoint
+-- Les trois exercices repris des tableurs (juin → mai) ; trésorerie d'ouverture à saisir (ou reprise des tableurs).
+INSERT INTO `exercice` (`id`, `libelle`, `debut`, `fin`, `tresorerie_ouverture`) VALUES
+('exercice-2024', 'Année 1 (2024-2025)', '2024-06-01', '2025-05-31', 0),
+('exercice-2025', 'Année 2 (2025-2026)', '2025-06-01', '2026-05-31', 0),
+('exercice-2026', 'Année 3 (2026-2027)', '2026-06-01', '2027-05-31', 0);

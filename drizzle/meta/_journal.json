@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1795350354542,
+      "tag": "0000_init",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1795351835558,
+      "tag": "0002_tresorerie",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1795354062140,
+      "tag": "0004_chantier",
+      "breakpoints": true
+    }
+  ]
+}

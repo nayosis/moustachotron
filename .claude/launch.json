@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "moustachotron",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 5183
+    },
+    {
+      "name": "moustachotron-reseau",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "run",
+        "dev:reseau"
+      ],
+      "port": 5183
+    }
+  ]
+}

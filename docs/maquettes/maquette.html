@@ -1,0 +1,418 @@
+<title>Maquette Le Moustachotron</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout : appli Mantine du socle — barre latérale sur ordinateur, vues par ancre (#tresorerie, #pipeline, #projet, #terrain) ; la vue terrain montre un téléphone. */
+:root{
+  --bg:#f3f2ef; --surface:#ffffff; --surface-2:#f8f7f4; --line:#e2dfd8; --fg:#25211e; --muted:#6f6760;
+  --accent:#2f6b5e; --accent-soft:#e3efeb; --accent-fg:#ffffff;
+  --ok:#2f7d4a; --ok-soft:#e4f2e8; --warn:#a8670f; --warn-soft:#fbf0dc; --bad:#b23b32; --bad-soft:#f8e3e0; --info:#3a6186; --info-soft:#e4ecf4;
+  --font-ui:Inter,"Segoe UI",system-ui,sans-serif; --font-titre:Georgia,Cambria,"Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1d1a17; --surface:#25211e; --surface-2:#2f2a26; --line:#3f3832; --fg:#e9e3dc; --muted:#a39890;
+  --accent:#6fb3a2; --accent-soft:#24352f; --accent-fg:#10201b;
+  --ok:#74c58f; --ok-soft:#1f3326; --warn:#e2a84f; --warn-soft:#3a2d17; --bad:#ee8a80; --bad-soft:#3d221f; --info:#8baec7; --info-soft:#1f2b37; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1d1a17; --surface:#25211e; --surface-2:#2f2a26; --line:#3f3832; --fg:#e9e3dc; --muted:#a39890;
+  --accent:#6fb3a2; --accent-soft:#24352f; --accent-fg:#10201b;
+  --ok:#74c58f; --ok-soft:#1f3326; --warn:#e2a84f; --warn-soft:#3a2d17; --bad:#ee8a80; --bad-soft:#3d221f; --info:#8baec7; --info-soft:#1f2b37; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.5}
+h1,h2,h3{font-family:var(--font-titre);font-weight:600;text-wrap:balance;margin:0}
+h1{font-size:1.6rem} h2{font-size:1.15rem} h3{font-size:1rem}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.muted{color:var(--muted)}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+nav.side{background:var(--surface);border-right:1px solid var(--line);padding:20px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.logo{display:flex;align-items:center;gap:10px;padding:0 8px 16px;font-family:var(--font-titre);font-size:1.1rem;font-weight:600}
+.logo svg{flex:none}
+nav.side a{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;color:var(--fg);text-decoration:none}
+nav.side a:hover{background:var(--surface-2)}
+nav.side a[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+nav.side .sep{border-top:1px solid var(--line);margin:10px 0}
+nav.side .note{margin-top:auto;font-size:12px;color:var(--muted);padding:8px}
+main{padding-block:24px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-width:0}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.entete{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.eyebrow{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.panneau{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0}
+.panneau>h2,.panneau>header{margin-bottom:12px}
+.panneau>header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.grille{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g2{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+button,.btn{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:8px;padding:6px 12px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn-p{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);font-weight:600}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:5px 12px;border-radius:7px}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.12);font-weight:600;color:var(--accent)}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.p-ok{background:var(--ok-soft);color:var(--ok)} .p-warn{background:var(--warn-soft);color:var(--warn)} .p-bad{background:var(--bad-soft);color:var(--bad)} .p-info{background:var(--info-soft);color:var(--info)} .p-neutre{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)} .p-acc{background:var(--accent-soft);color:var(--accent)}
+.kpi{display:flex;flex-direction:column;gap:4px}
+.kpi .val{font-size:1.75rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi .det{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:12.5px;color:var(--muted);margin-top:6px}
+.kpi.focus{outline:2px solid var(--accent);outline-offset:-2px}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+td.r,th.r{text-align:right}
+tr.groupe td{background:var(--surface-2);font-weight:600}
+tr.total td{font-weight:700;border-top:2px solid var(--line)}
+.defile{overflow-x:auto}
+.pos{color:var(--ok)} .neg{color:var(--bad)}
+.liste{display:flex;flex-direction:column}
+.liste .l{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.liste .l:last-child{border-bottom:0}
+.date{font-size:12px;color:var(--muted);width:52px;font-variant-numeric:tabular-nums}
+/* kanban */
+.kanban{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(230px,1fr);gap:12px;overflow-x:auto;padding-bottom:6px}
+.col{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.col h3{font-family:var(--font-ui);font-size:12.5px;font-weight:700;display:flex;justify-content:space-between}
+.carte{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;cursor:pointer;text-align:left}
+.carte:hover{border-color:var(--accent)}
+.carte .ligne{display:flex;justify-content:space-between;gap:6px;align-items:center;flex-wrap:wrap}
+.carte .nom{font-weight:600}
+/* stepper */
+.etapes{display:flex;gap:0;overflow-x:auto;padding:4px 0}
+.etape{flex:1 0 110px;display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);position:relative;padding-right:8px}
+.etape .pt{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:11px;font-weight:700;z-index:1}
+.etape::before{content:"";position:absolute;top:10px;left:22px;right:0;height:2px;background:var(--line)}
+.etape:last-child::before{display:none}
+.etape.fait .pt{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.etape.fait::before{background:var(--accent)}
+.etape.cours .pt{border-color:var(--accent);color:var(--accent)}
+.etape.cours{color:var(--fg);font-weight:600}
+.onglets{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.onglets button{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;padding:8px 12px;color:var(--muted)}
+.onglets button[aria-selected="true"]{border-bottom-color:var(--accent);color:var(--fg);font-weight:600}
+.fil{display:flex;flex-direction:column;gap:12px;border-left:2px solid var(--line);padding-left:16px;margin-left:6px}
+.fil .ev{position:relative}
+.fil .ev::before{content:"";position:absolute;left:-23px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.fil .ev.afaire::before{background:var(--surface);border:2px solid var(--warn)}
+/* téléphone */
+.scene{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:28px;align-items:start}
+.tel{border:10px solid #1b1917;border-radius:38px;background:var(--bg);height:760px;max-width:100%;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,.18)}
+.tel .barre-haut{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+.bandeau{font-size:12.5px;font-weight:600;padding:6px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.bandeau.hl{background:var(--warn-soft);color:var(--warn)}
+.bandeau.el{background:var(--ok-soft);color:var(--ok)}
+.tel .ecran{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.tel .bas{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);background:var(--surface)}
+.tel .bas button{border:0;border-radius:0;background:none;padding:8px 0 10px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
+.tel .bas button.on{color:var(--accent);font-weight:600}
+.tel .plus{background:var(--accent)!important;color:var(--accent-fg)!important;font-weight:700}
+.champ{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600}
+.champ input,.champ textarea,.champ select{font:inherit;font-weight:400;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface);color:var(--fg);width:100%}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.photos .ph{aspect-ratio:1;border-radius:8px;background:var(--surface-2);border:1px dashed var(--line);display:grid;place-items:center;font-size:11px;color:var(--muted);overflow:hidden;max-width:100%}
+.photos .ph img{width:100%;height:100%;object-fit:cover}
+.carte-t{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.attente{border-color:var(--warn);border-style:dashed}
+.legende{display:flex;flex-direction:column;gap:14px}
+.legende ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px}
+svg text{fill:var(--muted);font-family:var(--font-ui);font-size:11px}
+.badge-ex{font-size:11px;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:2px 8px;border-radius:6px}
+@media (max-width:960px){
+  .app{grid-template-columns:1fr}
+  nav.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--line);padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
+  nav.side .logo{padding:0 8px 0 0;width:100%}
+  nav.side .sep,nav.side .note{display:none}
+  .g3,.g2,.scene{grid-template-columns:minmax(0,1fr)}
+  .tel{height:680px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <nav class="side" aria-label="Navigation de la maquette">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="var(--accent)"/><path d="M6 20V12l8-6 8 6v8h-5v-5h-6v5z" fill="var(--accent-fg)"/></svg>
+      Le Moustachotron
+    </div>
+    <a href="#tresorerie" data-vue="tresorerie">Trésorerie</a>
+    <a href="#pipeline" data-vue="pipeline">Prospects &amp; projets</a>
+    <a href="#projet" data-vue="projet">Fiche projet</a>
+    <a href="#terrain" data-vue="terrain">Téléphone (terrain)</a>
+    <div class="sep"></div>
+    <a href="#tresorerie" tabindex="-1" aria-disabled="true" class="muted">Contacts</a>
+    <a href="#tresorerie" tabindex="-1" aria-disabled="true" class="muted">Mouvements</a>
+    <a href="#tresorerie" tabindex="-1" aria-disabled="true" class="muted">Paramètres</a>
+    <p class="note">Maquette 0.1 — données fictives. Nom de l'appli provisoire.</p>
+  </nav>
+
+  <main>
+    <!-- ============ TRÉSORERIE ============ -->
+    <section class="wrap" id="v-tresorerie" data-vue="tresorerie">
+      <div class="entete">
+        <div><div class="eyebrow">Exercice juin 2026 → mai 2027 · aujourd'hui 22 nov. 2026</div><h1>Trésorerie</h1></div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="muted" style="font-size:12.5px">Horizons</span>
+          <div class="seg" id="horizons" role="group" aria-label="Horizon mis en avant"></div>
+          <label class="muted" style="font-size:12.5px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="pondere"> pondérer les non-signés</label>
+        </div>
+      </div>
+      <div class="grille g3" id="kpis"></div>
+
+      <div class="grille g2">
+        <div class="panneau">
+          <header><h2>Solde projeté</h2><span class="muted" style="font-size:12px">TTC, jour par jour, échéances + charges récurrentes</span></header>
+          <div id="courbe"></div>
+        </div>
+        <div class="panneau">
+          <header><h2>Encaissements attendus</h2><span class="pill p-bad" id="nb-retard"></span></header>
+          <div class="liste" id="echeances"></div>
+        </div>
+      </div>
+
+      <div class="panneau">
+        <header><h2>Prévu / réalisé par catégorie</h2><span class="muted" style="font-size:12px">remplace « Synthèse Année 3 » · montants HT</span></header>
+        <div class="defile"><table id="synthese"></table></div>
+      </div>
+    </section>
+
+    <!-- ============ PIPELINE ============ -->
+    <section class="wrap" id="v-pipeline" data-vue="pipeline" hidden>
+      <div class="entete">
+        <div><div class="eyebrow">Avant-vente et chantiers</div><h1>Prospects &amp; projets</h1></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="seg" role="group" aria-label="Filtre"><button aria-pressed="true">Tous</button><button aria-pressed="false">AMO</button><button aria-pressed="false">MOE</button><button aria-pressed="false">Courtage</button></div><button class="btn-p">+ Prospect</button></div>
+      </div>
+      <div class="grille g3" id="pipe-kpis"></div>
+      <div class="kanban" id="kanban"></div>
+      <div class="panneau">
+        <header><h2>À relancer</h2><span class="muted" style="font-size:12px">interactions planifiées non faites</span></header>
+        <div class="liste" id="relances"></div>
+      </div>
+    </section>
+
+    <!-- ============ FICHE PROJET ============ -->
+    <section class="wrap" id="v-projet" data-vue="projet" hidden>
+      <div class="entete">
+        <div><div class="eyebrow"><a href="#pipeline" style="color:inherit">Projets</a> › AMO · Rénovation maison 1930</div><h1>Famille Besson — Niort</h1></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pill p-neutre">Origine : apporteur · Agence Duval</span><span class="pill p-info">Signé · 3 lots</span><a href="#pipeline" class="pill p-neutre">Tranche 2 : plomberie →</a><button>Changer le statut</button><button class="btn-p">+ Visite</button></div>
+      </div>
+      <div class="panneau"><div class="etapes" id="etapes"></div></div>
+      <div class="grille g3">
+        <div class="panneau kpi"><span class="eyebrow">Travaux signés</span><span class="val">58 420 €</span><span class="muted" style="font-size:12.5px">TTC · 53 914 € HT · 3 lots (tranche 1)</span></div>
+        <div class="panneau kpi"><span class="eyebrow">Honoraires + commissions</span><span class="val">14 899 €</span><span class="muted" style="font-size:12.5px">HT · honoraires 8 763 € TTC client (15 %) = 8 087 € HT au taux des travaux · 6 812 € commissions · − 809 € apport</span></div>
+        <div class="panneau kpi"><span class="eyebrow">Reste à facturer</span><span class="val">11 664 €</span><span class="muted" style="font-size:12.5px">HT · démarrage le 2 déc. : 40 % des honoraires + 3 commissions</span></div>
+      </div>
+      <div class="panneau">
+        <div class="onglets" role="tablist" id="onglets-projet"></div>
+        <div id="contenu-projet" style="padding-top:14px"></div>
+      </div>
+    </section>
+
+    <!-- ============ TERRAIN ============ -->
+    <section class="wrap" id="v-terrain" data-vue="terrain" hidden>
+      <div class="entete">
+        <div><div class="eyebrow">Application installée sur le téléphone</div><h1>Sur le chantier, sans réseau</h1></div>
+        <div class="seg" role="group" aria-label="Réseau simulé"><button id="r-off" aria-pressed="true">Mode avion</button><button id="r-on" aria-pressed="false">Réseau revenu</button></div>
+      </div>
+      <div class="scene">
+        <div class="tel" aria-label="Écran du téléphone">
+          <div class="barre-haut"><strong style="font-family:var(--font-titre)">Le Moustachotron</strong><span class="muted" style="font-size:12px" id="fraicheur">Données du 22/11 à 7 h 40</span></div>
+          <div class="bandeau hl" id="bandeau"></div>
+          <div class="ecran" id="ecran"></div>
+          <div class="bas" id="bas"></div>
+        </div>
+        <div class="panneau legende">
+          <h2>Ce que montre l'écran</h2>
+          <ol>
+            <li><strong>L'appli s'ouvre sans réseau</strong> : la coquille est en cache, les projets en cours et leurs contacts sont dans le « paquet terrain » rechargé le matin.</li>
+            <li><strong>Nouvelle visite</strong> : compte rendu, avancement par lot, réserves, photos. Tout est gardé sur le téléphone, marqué « en attente d'envoi ».</li>
+            <li><strong>Au retour du réseau</strong>, la file part dans l'ordre : photos d'abord, puis la visite. Le bureau la voit apparaître en direct.</li>
+            <li>Un changement de statut fait entre-temps par quelqu'un d'autre est signalé « à vérifier », jamais écrasé en silence.</li>
+          </ol>
+          <p class="muted" style="margin:0">Essayez : remplissez la visite, ajoutez une photo, enregistrez, puis cliquez « Réseau revenu ».</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(()=>{
+const AUJ=new Date(2026,10,22);
+const eur=(c,d=0)=>(c/100).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d})+" €";
+const jour=d=>d.toLocaleDateString("fr-FR",{day:"numeric",month:"short"});
+const plusJ=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- Données fictives ---------- */
+const SOLDE=2894350; // centimes
+const ECH=[ // encaissements attendus TTC
+ {d:"2026-11-12",p:"Garnier",t:"Solde honoraires",m:54600,s:"signe"},
+ {d:"2026-11-28",p:"Roux — Sarl Ébène",t:"Commission menuiserie",m:141800,s:"signe"},
+ {d:"2026-12-02",p:"Besson",t:"Honoraires démarrage (40 %)",m:350520,s:"signe"},
+ {d:"2026-12-02",p:"Besson — 3 entreprises",t:"Commissions au démarrage",m:817440,s:"signe"},
+ {d:"2026-12-10",p:"Lefort",t:"Commission maçonnerie",m:246000,s:"signe"},
+ {d:"2026-12-18",p:"Carpentier",t:"Acompte honoraires",m:50000,s:"proposition"},
+ {d:"2027-01-15",p:"Morel",t:"Honoraires démarrage",m:412000,s:"proposition"},
+ {d:"2027-01-29",p:"Picard",t:"Acompte honoraires",m:50000,s:"consultation"},
+ {d:"2027-02-05",p:"Lefort",t:"Solde honoraires",m:287500,s:"signe"},
+ {d:"2027-02-12",p:"Vidal",t:"Honoraires démarrage",m:356000,s:"consultation"},
+];
+const PROBA={signe:1,proposition:.5,consultation:.2};
+const LIB_S={signe:["Signé","p-ok"],proposition:["Proposition","p-info"],consultation:["Consultation","p-neutre"]};
+const CHARGES=[ // récurrentes mensuelles TTC, jour du mois
+ {j:1,l:"Loyer local",m:92000},{j:1,l:"Salaire",m:351500},{j:1,l:"LOA véhicule",m:56178},{j:5,l:"Échéance prêt",m:86078},
+ {j:12,l:"Assurances",m:12480},{j:15,l:"Redevance fixe réseau",m:49854},{j:15,l:"Redevance sur CA (5 %)",m:56900},
+ {j:16,l:"URSSAF",m:68000},{j:20,l:"Comptable",m:25800},{j:26,l:"Téléphonie, EDF",m:15800},{j:30,l:"Publicité mutualisée",m:78000},{j:28,l:"Frais divers",m:42000}
+];
+let horizons=[0,30,90]; let focus=30; let pond=false;
+
+function projection(nJours){
+ const fin=plusJ(AUJ,nJours); let enc=0,dec=0,retard=0;
+ for(const e of ECH){const d=new Date(e.d);const v=pond?Math.round(e.m*PROBA[e.s]):(e.s==="signe"?e.m:0);
+   if(d<AUJ) retard+=e.m; else if(d<=fin) enc+=v;}
+ for(let i=1;i<=nJours;i++){const d=plusJ(AUJ,i);for(const c of CHARGES) if(d.getDate()===c.j) dec+=c.m;}
+ const tva=nJours>=8?Math.round(nJours/30)*61000:0;
+ return {enc,dec,tva,retard,solde:SOLDE+enc-dec-tva};
+}
+const nomH=n=>n===0?"Aujourd'hui":n%30===0?`+${n/30} mois`:`+${n} j`;
+
+function rendreHorizons(){
+ $("#horizons").innerHTML=horizons.map(n=>`<button aria-pressed="${n===focus}" data-h="${n}">${nomH(n)}</button>`).join("")+`<button data-ajout title="Ajouter un horizon">+ 6 mois</button>`;
+ $("#horizons").querySelectorAll("button").forEach(b=>b.onclick=()=>{ if(b.dataset.ajout!==undefined){ if(!horizons.includes(180)){horizons.push(180);} focus=180; b.remove(); } else focus=+b.dataset.h; rendreTreso(); });
+}
+function rendreTreso(){
+ rendreHorizons();
+ $("#kpis").innerHTML=horizons.slice(0,4).map(n=>{const p=projection(n);
+  const det=n===0?`<span>Sur le compte</span><span class="num">${eur(SOLDE)}</span><span>Encaissements en retard</span><span class="num neg">${eur(p.retard)}</span>`
+   :`<span>Encaissements prévus</span><span class="num pos">+ ${eur(p.enc)}</span><span>Charges récurrentes</span><span class="num neg">− ${eur(p.dec)}</span><span>TVA à reverser (est.)</span><span class="num neg">− ${eur(p.tva)}</span>`;
+  const etat=p.solde<1500000?'<span class="pill p-bad">sous le seuil de 15 000 €</span>':p.solde<2500000?'<span class="pill p-warn">à surveiller</span>':'<span class="pill p-ok">confortable</span>';
+  return `<div class="panneau kpi ${n===focus?"focus":""}"><span class="eyebrow">${nomH(n)} · ${jour(plusJ(AUJ,n))}</span><span class="val">${eur(p.solde)}</span>${etat}<div class="det">${det}</div></div>`}).join("");
+ rendreCourbe(); rendreEcheances(); rendreSynthese();
+}
+function rendreCourbe(){
+ const N=Math.max(90,focus), W=720,H=230,ml=56,mr=14,mt=14,mb=28;
+ const pts=[];for(let i=0;i<=N;i++)pts.push(projection(i).solde/100);
+ const mn=Math.min(10000,...pts),mx=Math.max(...pts)*1.05;const lo=Math.floor(mn/5000)*5000,hi=Math.ceil(mx/5000)*5000;
+ const x=i=>ml+i*(W-ml-mr)/N,y=v=>mt+(hi-v)*(H-mt-mb)/(hi-lo);
+ let g="";for(let v=lo;v<=hi;v+=10000){g+=`<line x1="${ml}" x2="${W-mr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${ml-6}" y="${y(v)+4}" text-anchor="end">${(v/1000).toFixed(0)} k€</text>`;}
+ const seuil=`<line x1="${ml}" x2="${W-mr}" y1="${y(15000)}" y2="${y(15000)}" stroke="var(--bad)" stroke-dasharray="4 4" stroke-width="1"/><text x="${W-mr}" y="${y(15000)-5}" text-anchor="end" style="fill:var(--bad)">seuil 15 k€</text>`;
+ const d=pts.map((v,i)=>`${i?"L":"M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
+ const aire=d+`L${x(N)},${y(lo)}L${x(0)},${y(lo)}Z`;
+ let marques="";for(const n of horizons){ if(n>N) continue; const v=pts[n];marques+=`<line x1="${x(n)}" x2="${x(n)}" y1="${mt}" y2="${H-mb}" stroke="var(--line)" stroke-dasharray="2 3"/><circle cx="${x(n)}" cy="${y(v)}" r="${n===focus?5:3.5}" fill="${n===focus?"var(--accent)":"var(--surface)"}" stroke="var(--accent)" stroke-width="2"/><text x="${Math.min(x(n)+6,W-80)}" y="${y(v)-9}" style="fill:var(--fg);font-weight:600">${nomH(n)} ${Math.round(v/100)/10} k€</text>`;}
+ let mois="";for(let i=0;i<=N;i++){const dd=plusJ(AUJ,i);if(dd.getDate()===1)mois+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle">${dd.toLocaleDateString("fr-FR",{month:"short"})}</text>`;}
+ $("#courbe").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Courbe du solde projeté">${g}${seuil}<path d="${aire}" fill="var(--accent)" fill-opacity=".10"/><path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2"/>${marques}${mois}</svg>`;
+}
+function rendreEcheances(){
+ const nbR=ECH.filter(e=>new Date(e.d)<AUJ).length; $("#nb-retard").textContent=`${nbR} en retard`;
+ $("#echeances").innerHTML=ECH.slice(0,7).map(e=>{const r=new Date(e.d)<AUJ;const [l,c]=LIB_S[e.s];
+  return `<div class="l"><span class="date">${jour(new Date(e.d))}</span><span><strong>${esc(e.p)}</strong><br><span class="muted" style="font-size:12.5px">${esc(e.t)}</span></span><span style="text-align:right"><span class="num">${eur(e.m)}</span><br>${r?'<span class="pill p-bad">en retard</span>':`<span class="pill ${c}">${l}</span>`}</span></div>`}).join("");
+}
+function rendreSynthese(){
+ const mois=["Sept.","Oct.","Nov.","Déc.","Janv."]; const reel=[true,true,"partiel",false,false];
+ const L=[["g","Produits"],["Honoraires AMO",[50827,46364,31768,52000,41200,38000,60000,0,48000,0]],["Commissions EDB",[42320,41157,46026,39500,32000,0,38000,0,45000,0]],["Expertise",[41491,58056,23792,20000,18792,15000,12000,0,10000,0]],
+  ["g","Charges"],["Franchise et redevances",[18070,16365,17500,19004,17500,9000,18000,0,18000,0]],["Local",[10920,10384,10920,10700,10920,6000,10920,0,10920,0]],["Véhicule",[54315,88507,54315,52000,54315,30000,54315,0,54315,0]],["Salaire et mutuelle",[358985,358985,358985,358985,358985,358985,358985,0,358985,0]],["Banque et prêt",[91078,90559,91078,90559,91078,45000,91078,0,91078,0]]];
+ let h=`<thead><tr><th>Catégorie</th>${mois.map((m,i)=>`<th class="r" colspan="3">${m} ${reel[i]===true?'<span class="pill p-ok">clos</span>':reel[i]?'<span class="pill p-warn">en cours</span>':'<span class="pill p-neutre">prévu</span>'}</th>`).join("")}</tr><tr><th></th>${mois.map(()=>`<th class="r">Prévu</th><th class="r">Réalisé</th><th class="r">Écart</th>`).join("")}</tr></thead><tbody>`;
+ let charge=false;
+ for(const r of L){ if(r[0]==="g"){charge=r[1]==="Charges";h+=`<tr class="groupe"><td colspan="16">${r[1]}</td></tr>`;continue;}
+  h+=`<tr><td>${r[0]}</td>`;
+  for(let i=0;i<5;i++){const p=r[1][i*2],re=r[1][i*2+1];const fait=i<3;const ec=re-p;const mauvais=charge?ec>0:ec<0;
+   h+=`<td class="r num">${eur(p)}</td><td class="r num">${fait?eur(re):"—"}</td><td class="r num ${fait&&ec?(mauvais?"neg":"pos"):""}">${fait?(ec>0?"+":"")+eur(ec):""}</td>`;}
+  h+="</tr>";}
+ h+=`<tr class="total"><td>Trésorerie fin de mois</td><td class="r num" colspan="3">33 972 €</td><td class="r num" colspan="3">29 471 €</td><td class="r num" colspan="3">≈ 28 944 €</td><td class="r num" colspan="3">${eur(projection(39).solde)}</td><td class="r num" colspan="3">${eur(projection(70).solde)}</td></tr></tbody>`;
+ $("#synthese").innerHTML=h;
+}
+$("#pondere").onchange=e=>{pond=e.target.checked;rendreTreso();};
+
+/* ---------- Pipeline ---------- */
+const COLS=[
+ ["Premier contact",[["Picard","Audit + AMO","Maison de ville",null,"Relance 24 nov.","p-warn"],["Thomas","MOE","Extension 30 m²",null,"RDV 27 nov.","p-info"]]],
+ ["Visite / relevé",[["Vidal","AMO","Rénovation énergétique",95000,"CR à rédiger","p-neutre"]]],
+ ["Consultation entreprises",[["Besson · tranche 2","AMO","Plomberie",null,"2 devis / 3","p-neutre"],["Morel","AMO","Cuisine + SDB",48000,"3 devis / 5","p-neutre"],["Hamon","Courtage","Toiture",22000,"2 devis / 2","p-ok"]]],
+ ["Proposition envoyée",[["Carpentier","AMO","Combles + isolation",31500,"Sans réponse 18 j","p-bad"]]],
+ ["Signé",[["Besson","AMO","Maison 1930",58420,"Tranche 1 · 3 lots","p-info"],["Lefort","MOE","Longère",112000,"Démarrage 10 déc.","p-ok"]]],
+ ["Chantier en cours",[["Roux","AMO","Menuiseries",17400,"Visite 25 nov.","p-info"],["Garnier","AMO","Salle de bain",9800,"Réception 3 déc.","p-neutre"]]],
+];
+function rendrePipeline(){
+ $("#pipe-kpis").innerHTML=[["En avant-vente","6 projets","216 500 € TTC de travaux · 28 400 € HT attendus"],["Signés sur l'exercice","9 projets","233 200 € TTC · objectif CA 69 % de 140 000 €"],["Taux de transformation","42 %","sur 12 mois · délai moyen 38 j jusqu'à signature"]]
+  .map(([a,b,c])=>`<div class="panneau kpi"><span class="eyebrow">${a}</span><span class="val">${b}</span><span class="muted" style="font-size:12.5px">${c}</span></div>`).join("");
+ $("#kanban").innerHTML=COLS.map(([t,cs])=>`<div class="col"><h3><span>${t}</span><span class="muted">${cs.length}</span></h3>${cs.map(([n,m,o,mt,r,c])=>`<button class="carte" data-ouvre="${n}"><span class="ligne"><span class="nom">${n}</span><span class="pill p-acc">${m}</span></span><span class="muted" style="font-size:12.5px">${o}</span><span class="ligne"><span class="num">${mt?eur(mt*100):"—"}</span><span class="pill ${c}">${r}</span></span></button>`).join("")}</div>`).join("");
+ document.querySelectorAll("[data-ouvre]").forEach(b=>b.onclick=()=>{location.hash="projet"});
+ $("#relances").innerHTML=[["24 nov.","Picard","Rappeler pour fixer la visite","Appel","p-warn"],["25 nov.","Carpentier","Relancer la proposition (envoyée le 4 nov.)","Email","p-bad"],["26 nov.","Morel","Relancer Élec Ouest pour le devis électricité","Entreprise","p-neutre"],["2 déc.","Besson","Lot plomberie : 2e devis à demander","Entreprise","p-neutre"]]
+  .map(([d,n,t,k,c])=>`<div class="l"><span class="date">${d}</span><span><strong>${n}</strong> — ${t}</span><span class="pill ${c}">${k}</span></div>`).join("");
+}
+
+/* ---------- Fiche projet ---------- */
+const ETAPES=[["Réception prospect","2 sept."],["Contact","3 sept."],["Visite initiale","9 sept."],["Estimation remise","16 sept."],["Mission validée","22 sept."],["Contrat signé","1er oct."],["Consultation","3 oct."],["Devis reçus","14 oct."],["Devis validés (3 lots)","8 nov."],["Préparation","en cours"],["Démarrage","prévu 2 déc."],["Réception","prévue avr."]];
+const ONGLETS={
+ "Lots & devis":()=>`<div class="defile"><table><thead><tr><th>Lot</th><th>Entreprise</th><th>Devis</th><th class="r">Montant TTC</th><th class="r">TVA</th><th class="r">Commission</th><th>État</th></tr></thead><tbody>
+  ${[["Maçonnerie","Pierre & Chaux","D-2026-118 · v2",2465000,"10 %","13 %","p-ok","Signé 8 nov."],["Électricité","Élec Ouest","EO-4471",1301300,"10 %","13 %","p-ok","Signé 8 nov."],["Menuiseries","Ateliers Brisset","AB-0932",2075700,"5,5 %","12 %","p-ok","Signé 8 nov."],["Plomberie","2 devis reçus / 3 demandés","—",null,"10 %","13 %","p-neutre","Parti en tranche 2"]]
+   .map(([l,e,d,m,t,c,k,s])=>`<tr><td><strong>${l}</strong></td><td>${e}</td><td class="muted">${d}</td><td class="r num">${m?eur(m):"—"}</td><td class="r">${t}</td><td class="r">${c}</td><td><span class="pill ${k}">${s}</span></td></tr>`).join("")}
+  <tr class="total"><td colspan="3">Total signé</td><td class="r num">58 420 €</td><td></td><td></td><td></td></tr></tbody></table></div>`,
+ "Échéances":()=>`<div class="defile"><table><thead><tr><th>Date prévue</th><th>Nature</th><th>Payeur</th><th class="r">HT</th><th class="r">TTC</th><th>État</th></tr></thead><tbody>
+  ${[["1er oct.","Acompte (barème ≤ 75 k€ : 750 € TTC)","Client",69215,75000,"p-ok","Encaissé 6 oct."],["8 nov.","Signature des devis : 40 % − acompte","Client",254270,275520,"p-ok","Encaissé 20 nov."],["2 déc.","Démarrage des travaux : 40 %","Client",323480,350520,"p-info","Prévue"],["2 déc.","Commission maçonnerie (13 %)","Pierre & Chaux",291300,349560,"p-info","Au démarrage"],["2 déc.","Commission électricité (13 %)","Élec Ouest",153800,184560,"p-info","Au démarrage"],["2 déc.","Commission menuiseries (12 %)","Ateliers Brisset",236100,283320,"p-info","Au démarrage"],["avr.","Solde à la réception : 20 %","Client",161740,175260,"p-neutre","À la réception"],["avr.","Commission d'apport 10 % des honoraires HT (sortante)","Agence Duval",-80870,-97044,"p-warn","À verser à la réception"]]
+   .map(([d,n,p,h,t,k,s])=>`<tr><td>${d}</td><td>${n}</td><td class="muted">${p}</td><td class="r num ${h<0?"neg":""}">${eur(h)}</td><td class="r num ${t<0?"neg":""}">${eur(t)}</td><td><span class="pill ${k}">${s}</span></td></tr>`).join("")}</tbody></table></div>`,
+ "Documents":()=>`<div class="liste">${[["Plans état existant.pdf","Avant-vente","2,4 Mo"],["Photos relevé (14)","Avant-vente","31 Mo"],["Devis Pierre & Chaux v2.pdf","Lot maçonnerie","380 ko"],["Devis Élec Ouest.pdf","Lot électricité","210 ko"],["Contrat AMO signé.pdf","Signature","1,1 Mo"],["Attestation décennale Brisset.pdf","Lot menuiseries","95 ko"]]
+   .map(([n,c,t])=>`<div class="l"><span class="pill p-neutre">${n.endsWith(".pdf")?"PDF":"JPG"}</span><span><strong>${n}</strong><br><span class="muted" style="font-size:12.5px">${c}</span></span><span class="muted num">${t}</span></div>`).join("")}</div>`,
+ "Historique & relances":()=>`<div class="fil">${[["afaire","2 déc.","Relance","Lot plomberie : demander un 3e devis à Plomberie Gâtinaise"],["","8 nov.","Signature","3 lots signés sur 4 — plomberie en attente"],["","4 nov.","Rendez-vous","Présentation de la proposition chez le client (1 h 30)"],["","20 oct.","Email","Proposition envoyée : 4 lots, 66 900 € TTC"],["","14 oct.","Devis","Devis maçonnerie v2 reçu (−6 %)"],["","9 sept.","Visite","Relevé, 14 photos, compte rendu"]]
+   .map(([c,d,t,x])=>`<div class="ev ${c}"><span class="muted" style="font-size:12px">${d} · ${t}${c?' <span class="pill p-warn">à faire</span>':""}</span><div>${x}</div></div>`).join("")}</div>`,
+ "Visites":()=>`<div class="liste"><div class="l"><span class="date">9 sept.</span><span><strong>Visite de relevé</strong><br><span class="muted" style="font-size:12.5px">14 photos · CR envoyé au client le 10 sept.</span></span><span class="pill p-ok">PDF envoyé</span></div><div class="l"><span class="date">4 déc.</span><span><strong>Réunion de lancement</strong><br><span class="muted" style="font-size:12.5px">avec les 3 entreprises signées</span></span><span class="pill p-info">planifiée</span></div></div>`,
+};
+let onglet="Lots & devis";
+function rendreProjet(){
+ const i=9;$("#etapes").innerHTML=ETAPES.map(([t,d],k)=>`<div class="etape ${k<i?"fait":k===i?"cours":""}"><span class="pt">${k<i?"✓":k+1}</span><span>${t}</span><span class="muted" style="font-weight:400">${d}</span></div>`).join("");
+ $("#onglets-projet").innerHTML=Object.keys(ONGLETS).map(o=>`<button role="tab" aria-selected="${o===onglet}">${o}</button>`).join("");
+ $("#onglets-projet").querySelectorAll("button").forEach(b=>b.onclick=()=>{onglet=b.textContent;rendreProjet()});
+ $("#contenu-projet").innerHTML=ONGLETS[onglet]();
+}
+
+/* ---------- Téléphone ---------- */
+let enLigne=false, file=[], ecranT="jour", photos=[];
+function bandeau(){const b=$("#bandeau");
+ if(enLigne){b.className="bandeau el";b.innerHTML=file.length?`<span>Envoi en cours…</span>`:`<span>En ligne · tout est envoyé</span>`;}
+ else{b.className="bandeau hl";b.innerHTML=`<span>Hors ligne</span><span>${file.length} saisie${file.length>1?"s":""} en attente</span>`;}}
+function rendreTel(){
+ bandeau();
+ const bas=[["jour","Aujourd'hui"],["projets","Projets"],["visite","+ Visite"],["attente","Envois"]];
+ $("#bas").innerHTML=bas.map(([k,l])=>`<button class="${ecranT===k?"on":""} ${k==="visite"?"plus":""}" data-e="${k}">${l}${k==="attente"&&file.length?` (${file.length})`:""}</button>`).join("");
+ $("#bas").querySelectorAll("button").forEach(b=>b.onclick=()=>{ecranT=b.dataset.e;rendreTel()});
+ const E=$("#ecran");
+ if(ecranT==="jour"){
+  E.innerHTML=`<div class="carte-t"><span class="muted" style="font-size:12px">Trésorerie · au 22/11 à 7 h 40</span><span style="display:flex;justify-content:space-between;gap:8px"><span>Maintenant</span><strong class="num">28 944 €</strong></span><span style="display:flex;justify-content:space-between;gap:8px"><span>Fin novembre (prévu)</span><strong class="num">${eur(projection(8).solde)}</strong></span><span class="pill p-bad" style="align-self:flex-start">1 encaissement en retard</span></div>
+   <div class="eyebrow">Mardi 24 novembre</div>
+   <div class="carte-t"><span class="muted" style="font-size:12px">9 h 00 · Visite de chantier</span><strong>Roux — Menuiseries</strong><span style="font-size:12.5px">12 rue des Tanneurs, Niort</span><button class="btn-p" data-e="visite" style="align-self:flex-start;margin-top:4px">Commencer la visite</button></div>
+   <div class="carte-t"><span class="muted" style="font-size:12px">14 h 30 · Rendez-vous découverte</span><strong>Thomas — Extension</strong><span style="font-size:12.5px">Contact : 06 •• •• •• 12</span></div>
+   <div class="eyebrow">À relancer</div>
+   <div class="carte-t"><strong>Picard</strong><span style="font-size:12.5px">Rappeler pour fixer la visite</span><span class="pill p-warn" style="align-self:flex-start">aujourd'hui</span></div>
+   ${file.filter(f=>f.type==="Visite").map(f=>`<div class="carte-t attente"><strong>${esc(f.titre)}</strong><span class="pill p-warn" style="align-self:flex-start">en attente d'envoi</span></div>`).join("")}`;
+  E.querySelectorAll("[data-e]").forEach(b=>b.onclick=()=>{ecranT="visite";rendreTel()});
+ } else if(ecranT==="projets"){
+  E.innerHTML=`<div class="eyebrow">Projets en cours (paquet terrain)</div>`+["Roux · Menuiseries · Chantier","Garnier · Salle de bain · Réception 3 déc.","Besson · Maison 1930 · Préparation","Lefort · Longère · Démarrage 10 déc."].map(t=>{const [a,b,c]=t.split(" · ");return `<div class="carte-t"><strong>${a}</strong><span style="font-size:12.5px">${b}</span><span class="muted" style="font-size:12px">${c}</span></div>`}).join("")+`<p class="muted" style="font-size:12px;margin:0">Les projets clos ne sont pas emportés ; de la trésorerie, seul le résumé (maintenant, fin de mois) l'est.</p>`;
+ } else if(ecranT==="visite"){
+  E.innerHTML=`<div class="eyebrow">Rapport de visite n°6 · Roux · repris du n°5</div>
+   <div class="champ"><span>Qui est là ?</span>${[["M. Roux (maître d'ouvrage)","P"],["Ateliers Brisset · lot 1","P"],["Élec Ouest · lot 2","E"]].map(([n,s])=>`<span style="display:flex;justify-content:space-between;align-items:center;font-weight:400"><span>${n}</span><span class="seg">${["P","A","R","E"].map(x=>`<button type="button" aria-pressed="${x===s}" style="padding:2px 8px">${x}</button>`).join("")}</span></span>`).join("")}</div>
+   <label class="champ" for="v-type">Type<select id="v-type"><option>Visite de chantier</option><option>Réunion de lancement</option><option>Réception</option></select></label>
+   <label class="champ" for="v-pres">Présents<input id="v-pres" value="M. Roux, Ateliers Brisset (chef d'équipe)"></label>
+   <label class="champ" for="v-av">Avancement menuiseries<input id="v-av" type="range" min="0" max="100" step="10" value="60"></label>
+   <label class="champ" for="v-cr">Compte rendu<textarea id="v-cr" rows="4">Fenêtres RDC posées. Porte-fenêtre séjour : jeu en partie basse, reprise demandée. Volets prévus semaine 49.</textarea></label>
+   <label class="champ" for="v-res">Réserve · lot menuiseries (Ateliers Brisset)<input id="v-res" value="Joint porte-fenêtre séjour à reprendre"></label>
+   <div class="champ"><span>Photos</span><div class="photos" id="ph">${photos.map(u=>`<div class="ph"><img src="${u}" alt="Photo jointe"></div>`).join("")}<label class="ph" for="v-photo" style="cursor:pointer">+ Photo</label></div><input id="v-photo" type="file" accept="image/*" multiple hidden></div>
+   <button class="btn-p" id="v-ok">Enregistrer${enLigne?"":" (sur le téléphone)"}</button>`;
+  $("#v-photo").onchange=e=>{for(const f of e.target.files){photos.push(URL.createObjectURL(f));}rendreTel();};
+  $("#v-ok").onclick=()=>{const n=photos.length||2;for(let i=0;i<n;i++)file.push({type:"Photo",titre:`Photo ${i+1} — Roux`});file.push({type:"Visite",titre:"Visite Roux — 24 nov."});photos=[];ecranT="attente";if(enLigne)envoyer();rendreTel();};
+ } else {
+  E.innerHTML=`<div class="eyebrow">En attente d'envoi</div>`+(file.length?file.map((f,i)=>`<div class="carte-t attente"><span class="muted" style="font-size:12px">${i+1}. ${f.type}</span><strong>${esc(f.titre)}</strong><span class="muted" style="font-size:12px">saisie à ${9+i%2} h ${12+i*3}, envoi au retour du réseau</span></div>`).join(""):`<div class="carte-t"><strong>Rien en attente</strong><span class="muted" style="font-size:12.5px">Toutes vos saisies sont arrivées au bureau.</span></div>`)
+   +`<div class="carte-t"><span class="muted" style="font-size:12px">Exemple de conflit</span><strong>Statut Garnier</strong><span style="font-size:12.5px">Vous : « Réception » · Bureau : « Réserves levées » (modifié entre-temps)</span><span style="display:flex;gap:6px"><button>Garder le mien</button><button>Garder celui du bureau</button></span></div>`;
+ }
+}
+function envoyer(){ if(!file.length){rendreTel();return;} setTimeout(()=>{file.shift();rendreTel();envoyer();},450); }
+$("#r-off").onclick=()=>{enLigne=false;$("#r-off").setAttribute("aria-pressed","true");$("#r-on").setAttribute("aria-pressed","false");rendreTel();};
+$("#r-on").onclick=()=>{enLigne=true;$("#r-on").setAttribute("aria-pressed","true");$("#r-off").setAttribute("aria-pressed","false");$("#fraicheur").textContent="Données à jour";rendreTel();envoyer();};
+
+/* ---------- Routage ---------- */
+const VUES=["tresorerie","pipeline","projet","terrain"];
+function route(){const v=VUES.includes(location.hash.slice(1))?location.hash.slice(1):"tresorerie";
+ document.querySelectorAll("section[data-vue]").forEach(s=>s.hidden=s.dataset.vue!==v);
+ document.querySelectorAll("nav.side a[data-vue]").forEach(a=>a.toggleAttribute("aria-current",a.dataset.vue===v)||a.removeAttribute("aria-current"));
+ document.querySelectorAll("nav.side a[data-vue]").forEach(a=>{if(a.dataset.vue===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
+}
+addEventListener("hashchange",route);
+rendreTreso();rendrePipeline();rendreProjet();rendreTel();route();
+})();
+</script>

@@ -1,0 +1,1360 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "c54fa1ba-3eb3-4feb-9442-e743e4c0ad31",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "contact": {
+      "name": "contact",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "nom": {
+          "name": "nom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "interlocuteur": {
+          "name": "interlocuteur",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "corps_etat": {
+          "name": "corps_etat",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "telephone": {
+          "name": "telephone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "adresse": {
+          "name": "adresse",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "archive": {
+          "name": "archive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(datetime('now'))"
+        },
+        "cree_par": {
+          "name": "cree_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_par": {
+          "name": "modifie_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_le": {
+          "name": "modifie_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "contact_type_idx": {
+          "name": "contact_type_idx",
+          "columns": [
+            "type"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "devis": {
+      "name": "devis",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lot_id": {
+          "name": "lot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "entreprise_id": {
+          "name": "entreprise_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reference": {
+          "name": "reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "date": {
+          "name": "date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "montant_ttc": {
+          "name": "montant_ttc",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "statut": {
+          "name": "statut",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'recu'"
+        },
+        "archive": {
+          "name": "archive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(datetime('now'))"
+        },
+        "cree_par": {
+          "name": "cree_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_par": {
+          "name": "modifie_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_le": {
+          "name": "modifie_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "devis_lot_idx": {
+          "name": "devis_lot_idx",
+          "columns": [
+            "lot_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "devis_lot_id_lot_id_fk": {
+          "name": "devis_lot_id_lot_id_fk",
+          "tableFrom": "devis",
+          "tableTo": "lot",
+          "columnsFrom": [
+            "lot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "devis_entreprise_id_contact_id_fk": {
+          "name": "devis_entreprise_id_contact_id_fk",
+          "tableFrom": "devis",
+          "tableTo": "contact",
+          "columnsFrom": [
+            "entreprise_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "document": {
+      "name": "document",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "projet_id": {
+          "name": "projet_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lot_id": {
+          "name": "lot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "devis_id": {
+          "name": "devis_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "contact_id": {
+          "name": "contact_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "nom": {
+          "name": "nom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fichier": {
+          "name": "fichier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mime": {
+          "name": "mime",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "taille": {
+          "name": "taille",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "valide_jusqu_au": {
+          "name": "valide_jusqu_au",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "archive": {
+          "name": "archive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(datetime('now'))"
+        },
+        "cree_par": {
+          "name": "cree_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_par": {
+          "name": "modifie_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_le": {
+          "name": "modifie_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "document_projet_idx": {
+          "name": "document_projet_idx",
+          "columns": [
+            "projet_id"
+          ],
+          "isUnique": false
+        },
+        "document_contact_idx": {
+          "name": "document_contact_idx",
+          "columns": [
+            "contact_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "document_projet_id_projet_id_fk": {
+          "name": "document_projet_id_projet_id_fk",
+          "tableFrom": "document",
+          "tableTo": "projet",
+          "columnsFrom": [
+            "projet_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "document_lot_id_lot_id_fk": {
+          "name": "document_lot_id_lot_id_fk",
+          "tableFrom": "document",
+          "tableTo": "lot",
+          "columnsFrom": [
+            "lot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "document_devis_id_devis_id_fk": {
+          "name": "document_devis_id_devis_id_fk",
+          "tableFrom": "document",
+          "tableTo": "devis",
+          "columnsFrom": [
+            "devis_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "document_contact_id_contact_id_fk": {
+          "name": "document_contact_id_contact_id_fk",
+          "tableFrom": "document",
+          "tableTo": "contact",
+          "columnsFrom": [
+            "contact_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "interaction": {
+      "name": "interaction",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "contact_id": {
+          "name": "contact_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "projet_id": {
+          "name": "projet_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nature": {
+          "name": "nature",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "date": {
+          "name": "date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "heure": {
+          "name": "heure",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "objet": {
+          "name": "objet",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "texte": {
+          "name": "texte",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "a_faire_le": {
+          "name": "a_faire_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "faite": {
+          "name": "faite",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "archive": {
+          "name": "archive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(datetime('now'))"
+        },
+        "cree_par": {
+          "name": "cree_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_par": {
+          "name": "modifie_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_le": {
+          "name": "modifie_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "interaction_contact_idx": {
+          "name": "interaction_contact_idx",
+          "columns": [
+            "contact_id"
+          ],
+          "isUnique": false
+        },
+        "interaction_projet_idx": {
+          "name": "interaction_projet_idx",
+          "columns": [
+            "projet_id"
+          ],
+          "isUnique": false
+        },
+        "interaction_a_faire_idx": {
+          "name": "interaction_a_faire_idx",
+          "columns": [
+            "a_faire_le"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "interaction_contact_id_contact_id_fk": {
+          "name": "interaction_contact_id_contact_id_fk",
+          "tableFrom": "interaction",
+          "tableTo": "contact",
+          "columnsFrom": [
+            "contact_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "interaction_projet_id_projet_id_fk": {
+          "name": "interaction_projet_id_projet_id_fk",
+          "tableFrom": "interaction",
+          "tableTo": "projet",
+          "columnsFrom": [
+            "projet_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "jalon": {
+      "name": "jalon",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "projet_id": {
+          "name": "projet_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "date_prevue": {
+          "name": "date_prevue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "date_reelle": {
+          "name": "date_reelle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cree_par": {
+          "name": "cree_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_par": {
+          "name": "modifie_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_le": {
+          "name": "modifie_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "jalon_projet_code_idx": {
+          "name": "jalon_projet_code_idx",
+          "columns": [
+            "projet_id",
+            "code"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "jalon_projet_id_projet_id_fk": {
+          "name": "jalon_projet_id_projet_id_fk",
+          "tableFrom": "jalon",
+          "tableTo": "projet",
+          "columnsFrom": [
+            "projet_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "journal": {
+      "name": "journal",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "quand": {
+          "name": "quand",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "utilisateur": {
+          "name": "utilisateur",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fonction": {
+          "name": "fonction",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cible": {
+          "name": "cible",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resume": {
+          "name": "resume",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "avant": {
+          "name": "avant",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "apres": {
+          "name": "apres",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "journal_quand_idx": {
+          "name": "journal_quand_idx",
+          "columns": [
+            "quand"
+          ],
+          "isUnique": false
+        },
+        "journal_utilisateur_idx": {
+          "name": "journal_utilisateur_idx",
+          "columns": [
+            "utilisateur"
+          ],
+          "isUnique": false
+        },
+        "journal_cible_idx": {
+          "name": "journal_cible_idx",
+          "columns": [
+            "cible"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "lot": {
+      "name": "lot",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "projet_id": {
+          "name": "projet_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "numero": {
+          "name": "numero",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "corps_etat": {
+          "name": "corps_etat",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "entreprise_id": {
+          "name": "entreprise_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tva_pb": {
+          "name": "tva_pb",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1000
+        },
+        "commission_pb": {
+          "name": "commission_pb",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1300
+        },
+        "montant_ttc": {
+          "name": "montant_ttc",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "archive": {
+          "name": "archive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "cree_par": {
+          "name": "cree_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_par": {
+          "name": "modifie_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_le": {
+          "name": "modifie_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "lot_projet_idx": {
+          "name": "lot_projet_idx",
+          "columns": [
+            "projet_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "lot_projet_id_projet_id_fk": {
+          "name": "lot_projet_id_projet_id_fk",
+          "tableFrom": "lot",
+          "tableTo": "projet",
+          "columnsFrom": [
+            "projet_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "lot_entreprise_id_contact_id_fk": {
+          "name": "lot_entreprise_id_contact_id_fk",
+          "tableFrom": "lot",
+          "tableTo": "contact",
+          "columnsFrom": [
+            "entreprise_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "mission": {
+      "name": "mission",
+      "columns": {
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "libelle": {
+          "name": "libelle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mode": {
+          "name": "mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "taux_pb": {
+          "name": "taux_pb",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "forfait_ttc": {
+          "name": "forfait_ttc",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tva_pb": {
+          "name": "tva_pb",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "avec_travaux": {
+          "name": "avec_travaux",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "avec_acompte": {
+          "name": "avec_acompte",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "echeancier": {
+          "name": "echeancier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ordre": {
+          "name": "ordre",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "archive": {
+          "name": "archive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "cree_par": {
+          "name": "cree_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_par": {
+          "name": "modifie_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_le": {
+          "name": "modifie_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "origine": {
+      "name": "origine",
+      "columns": {
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "libelle": {
+          "name": "libelle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ordre": {
+          "name": "ordre",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "archive": {
+          "name": "archive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "cree_par": {
+          "name": "cree_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_par": {
+          "name": "modifie_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_le": {
+          "name": "modifie_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "parametre": {
+      "name": "parametre",
+      "columns": {
+        "cle": {
+          "name": "cle",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "valeur": {
+          "name": "valeur",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "projet": {
+      "name": "projet",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reference": {
+          "name": "reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "intitule": {
+          "name": "intitule",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mission_code": {
+          "name": "mission_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "origine_code": {
+          "name": "origine_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "apporteur_id": {
+          "name": "apporteur_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "projet_origine_id": {
+          "name": "projet_origine_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "adresse": {
+          "name": "adresse",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "taux_pb": {
+          "name": "taux_pb",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "forfait_ttc": {
+          "name": "forfait_ttc",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "taux_apport_pb": {
+          "name": "taux_apport_pb",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "issue": {
+          "name": "issue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'en_cours'"
+        },
+        "motif_issue": {
+          "name": "motif_issue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "archive": {
+          "name": "archive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(datetime('now'))"
+        },
+        "cree_par": {
+          "name": "cree_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_par": {
+          "name": "modifie_par",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modifie_le": {
+          "name": "modifie_le",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "projet_client_idx": {
+          "name": "projet_client_idx",
+          "columns": [
+            "client_id"
+          ],
+          "isUnique": false
+        },
+        "projet_reference_idx": {
+          "name": "projet_reference_idx",
+          "columns": [
+            "reference"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "projet_client_id_contact_id_fk": {
+          "name": "projet_client_id_contact_id_fk",
+          "tableFrom": "projet",
+          "tableTo": "contact",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "projet_mission_code_mission_code_fk": {
+          "name": "projet_mission_code_mission_code_fk",
+          "tableFrom": "projet",
+          "tableTo": "mission",
+          "columnsFrom": [
+            "mission_code"
+          ],
+          "columnsTo": [
+            "code"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "projet_origine_code_origine_code_fk": {
+          "name": "projet_origine_code_origine_code_fk",
+          "tableFrom": "projet",
+          "tableTo": "origine",
+          "columnsFrom": [
+            "origine_code"
+          ],
+          "columnsTo": [
+            "code"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "projet_apporteur_id_contact_id_fk": {
+          "name": "projet_apporteur_id_contact_id_fk",
+          "tableFrom": "projet",
+          "tableTo": "contact",
+          "columnsFrom": [
+            "apporteur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
