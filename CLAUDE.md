@@ -60,5 +60,6 @@ bun scripts/charges-depuis-synthese.ts "docs/sources/Tableau de gestion.xlsx" "S
 **Phases 1 (Contacts & Projets), 2 (Trésorerie) et 3a (visites et rapport PDF) livrées en développement le
 22/11/2026, version 0.4.0** — 88 tests verts. Base locale : tableurs repris (1 284 mouvements), 32 charges récurrentes, 14 chantiers en cours.
 Prochaine étape : **phase 3b** (hors ligne terrain : skill `hors-ligne`, `docs/architecture-hors-ligne.md`).
-Dépôt privé : https://github.com/nayosis/moustachotron (image `ghcr.io/nayosis/moustachotron`). Déploiement sur le
+Dépôt privé : https://github.com/nayosis/moustachotron (image `ghcr.io/nayosis/moustachotron`), en ligne sur
+https://moustachotron.gouadon.fr. Déploiement sur le
 serveur Raitchu : `docs/deploiement-raitchu.md`. Améliorations du socle à reporter : `docs/ameliorations-socle.md`.

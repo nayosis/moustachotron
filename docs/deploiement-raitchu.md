@@ -17,7 +17,7 @@ PC (code) ──git push + étiquette v0.4.0──► GitHub (dépôt privé)
                                     Raitchu : docker compose pull && up -d
                                               │ port 3000
                                               ▼
-                              reverse proxy HTTPS ──► https://moustachotron.<ton-domaine>
+                              reverse proxy HTTPS ──► https://moustachotron.gouadon.fr
 ```
 
 ## 1. Une seule fois : mettre le code sur GitHub
@@ -120,28 +120,61 @@ docker compose pull && docker compose up -d && docker compose logs -f --tail=50
 Les logs affichent « Migrations appliquées… » puis l'adresse. `http://raitchu:3000` doit répondre (créer alors le
 compte administrateur à l'écran, ou le définir dans `.env` avec `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_MOT_DE_PASSE`).
 
-## 5. HTTPS (obligatoire pour le téléphone hors ligne et les notifications)
+## 5. HTTPS sur moustachotron.gouadon.fr (obligatoire pour le téléphone hors ligne et les notifications)
 
 L'application installée sur le téléphone, le hors ligne (phase 3b) et les notifications n'existent qu'en **HTTPS**.
-Trois options, de la plus simple à la plus classique :
+Adresse retenue : **https://moustachotron.gouadon.fr**.
 
-1. **Tailscale** (sans ouvrir de port) : installer Tailscale sur Raitchu et le téléphone, puis
-   `tailscale serve --bg 3000` sur Raitchu → `https://raitchu.<tailnet>.ts.net`, accessible seulement de tes appareils.
-2. **Caddy** (certificat automatique ; nom de domaine pointant vers Raitchu, ports 80/443 ouverts) :
+### 5.1 DNS
+
+Chez le registrar de `gouadon.fr` (zone DNS), créer l'enregistrement qui mène à Raitchu :
+
+| Type | Nom | Valeur |
+|---|---|---|
+| `A` | `moustachotron` | adresse IPv4 publique de la box / de Raitchu |
+| `AAAA` (si IPv6) | `moustachotron` | adresse IPv6 publique de Raitchu |
+
+Ou, si `raitchu.gouadon.fr` existe déjà : `CNAME moustachotron → raitchu.gouadon.fr.`. Vérifier depuis le PC :
+
+```powershell
+Resolve-DnsName moustachotron.gouadon.fr
+```
+
+Raitchu derrière une box : rediriger les ports **80 et 443** de la box vers Raitchu (le 80 sert au certificat Let's
+Encrypt). Adresse IP publique qui change : un DNS dynamique chez le registrar (ou `ddclient` sur Raitchu).
+
+### 5.2 Reverse proxy
+
+**Caddy** (le plus simple : certificat obtenu et renouvelé tout seul). `/etc/caddy/Caddyfile` :
 
 ```
-moustachotron.<ton-domaine> {
+moustachotron.gouadon.fr {
     reverse_proxy 127.0.0.1:3000 {
+        # Mise à jour en direct (événements continus) : pas de mise en mémoire tampon.
         flush_interval -1
     }
+    header X-Robots-Tag "noindex, nofollow"
 }
 ```
 
-3. **nginx** : exemple complet dans `docker/nginx-exemple.conf` (dont le bloc `/api/evenements` sans tampon, pour la
-   mise à jour en direct).
+```bash
+sudo systemctl reload caddy && curl -I https://moustachotron.gouadon.fr/api/sante
+```
 
-Avec un reverse proxy sur Raitchu même, restreindre le port à la machine : `APP_PORT` mappé en
-`"127.0.0.1:3000:3000"` dans `docker-compose.yml`.
+**nginx** (s'il tourne déjà sur Raitchu) : partir de `docker/nginx-exemple.conf` en remplaçant `app.example.org` par
+`moustachotron.gouadon.fr`, puis `sudo certbot --nginx -d moustachotron.gouadon.fr` pour le certificat.
+
+Le proxy étant sur Raitchu, n'exposer le conteneur qu'à la machine elle-même : dans `docker-compose.yml`, mapper le
+port en `"127.0.0.1:3000:3000"` (sinon `http://raitchu:3000` contournerait le HTTPS).
+
+**Sans ouvrir de port** (alternative) : Tailscale sur Raitchu et le téléphone, `tailscale serve --bg 3000` →
+`https://raitchu.<tailnet>.ts.net`, accessible de tes seuls appareils (le domaine n'est alors pas utilisé).
+
+### 5.3 Contrôle
+
+- `https://moustachotron.gouadon.fr` affiche la connexion, cadenas valide.
+- Sur le téléphone : ouvrir l'adresse, menu du navigateur → **Ajouter à l'écran d'accueil** (iPhone : Safari →
+  Partager → Sur l'écran d'accueil). L'appli s'ouvre alors en plein écran.
 
 ## 6. Y mettre tes données actuelles
 
