@@ -8,6 +8,7 @@
  */
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { Database } from "bun:sqlite";
+import { requete } from "./requete";
 
 /** `admin` : admin ou super admin (par exemple : seuls à pouvoir retoucher une fiche validée). */
 export type Contexte = { utilisateur: string; admin?: boolean; superAdmin?: boolean; client?: string };
@@ -27,7 +28,7 @@ const MAINTENANT = "strftime('%Y-%m-%dT%H:%M:%fZ', 'now')";
 /** Installe la table de contexte et les déclencheurs sur cette connexion (après les migrations). */
 export function installerTracabilite(base: Database) {
   base.exec("CREATE TEMP TABLE IF NOT EXISTS contexte (utilisateur TEXT)");
-  if (!base.query("SELECT 1 FROM temp.contexte").get()) base.exec("INSERT INTO temp.contexte VALUES (NULL)");
+  if (!requete(base, "SELECT 1 FROM temp.contexte", (q) => q.get())) base.exec("INSERT INTO temp.contexte VALUES (NULL)");
   for (const t of TABLES_SUIVIES) {
     base.exec(`
       CREATE TEMP TRIGGER IF NOT EXISTS trace_${t}_creation AFTER INSERT ON main.${t}
@@ -48,5 +49,5 @@ export function installerTracabilite(base: Database) {
 
 /** Recopie l'utilisateur de la requête en cours dans la table de contexte (avant une écriture). */
 export function fixerContexte(base: Database) {
-  base.query("UPDATE temp.contexte SET utilisateur = ?").run(utilisateurCourant());
+  requete(base, "UPDATE temp.contexte SET utilisateur = ?", (q) => q.run(utilisateurCourant()));
 }

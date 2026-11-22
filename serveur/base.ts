@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { installerExecuteur, type Executeur, type Statement } from "../src/db/client";
 import { fixerContexte, installerTracabilite } from "./tracabilite";
+import { requete } from "./requete";
 
 /** Exécuteur SQL sur une base bun:sqlite : celui qu'utilisent les fonctions de src/data/ (via Drizzle). */
 export function executeurSqlite(base: Database, suivie = false): Executeur {
@@ -100,7 +101,7 @@ export function fermerBase() {
  */
 export function migrer(base: Database, dossier: string) {
   base.exec("CREATE TABLE IF NOT EXISTS __migrations (nom TEXT PRIMARY KEY, appliquee_le TEXT NOT NULL DEFAULT (datetime('now')))");
-  const faites = new Set(base.query("SELECT nom FROM __migrations").values().map((r) => r[0] as string));
+  const faites = new Set(requete(base, "SELECT nom FROM __migrations", (q) => q.values()).map((r) => r[0] as string));
   const aFaire = readdirSync(dossier)
     .filter((f) => f.endsWith(".sql") && !faites.has(f))
     .sort();
@@ -111,7 +112,7 @@ export function migrer(base: Database, dossier: string) {
       .filter(Boolean);
     base.transaction(() => {
       for (const sql of instructions) base.exec(sql);
-      base.query("INSERT INTO __migrations (nom) VALUES (?)").run(nom);
+      requete(base, "INSERT INTO __migrations (nom) VALUES (?)", (q) => q.run(nom));
     })();
   }
   return aFaire;

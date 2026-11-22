@@ -8,6 +8,7 @@
  *   Les comptes ne sont pas touchés.
  */
 import { Database } from "bun:sqlite";
+import { requete } from "./requete";
 import {
   closeSync, copyFileSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, readSync, renameSync, rmSync, statSync, unlinkSync, writeSync,
 } from "node:fs";
@@ -33,8 +34,8 @@ export type Manifeste = {
 };
 
 export function manifeste(base: Database, motif: string): Manifeste {
-  const compteurs = Object.fromEntries(Object.entries(COMPTEURS).map(([libelle, sql]) => [libelle, Number(base.query(sql).values()[0]?.[0] ?? 0)]));
-  const migrations = base.query("select nom from __migrations order by nom").values().map((r) => r[0] as string);
+  const compteurs = Object.fromEntries(Object.entries(COMPTEURS).map(([libelle, sql]) => [libelle, Number(requete(base, sql, (q) => q.values())[0]?.[0] ?? 0)]));
+  const migrations = requete(base, "select nom from __migrations order by nom", (q) => q.values()).map((r) => r[0] as string);
   return { application: "Le Moustachotron", format: 1, creeLe: new Date().toISOString(), motif, migrations, compteurs };
 }
 
@@ -64,7 +65,7 @@ function* blocsDe(chemin: string, taille = 1024 * 1024) {
 export function fluxSauvegarde(motif = "export"): ReadableStream<Uint8Array> {
   const base = baseCourante();
   const copie = join(DOSSIER_DONNEES, `export-${crypto.randomUUID()}.db`);
-  base.query("VACUUM INTO ?").run(copie);
+  requete(base, "VACUUM INTO ?", (q) => q.run(copie));
   const m = manifeste(base, motif);
   const fichiers = existsSync(DOSSIER_FICHIERS) ? readdirSync(DOSSIER_FICHIERS).filter(nomValide) : [];
   const nettoyer = () => existsSync(copie) && unlinkSync(copie);
@@ -150,9 +151,9 @@ function verifier(dossier: string): Partial<Manifeste> {
   if (!existsSync(join(dossier, BASE))) throw new Error("La sauvegarde ne contient pas de base de données.");
   const base = new Database(join(dossier, BASE), { readonly: true });
   try {
-    const integrite = base.query("PRAGMA integrity_check").values()[0]?.[0];
+    const integrite = requete(base, "PRAGMA integrity_check", (q) => q.values())[0]?.[0];
     if (integrite !== "ok") throw new Error(`Base de la sauvegarde endommagée (${integrite}).`);
-    const tables = new Set(base.query("select name from sqlite_master where type = 'table'").values().map((r) => r[0]));
+    const tables = new Set(requete(base, "select name from sqlite_master where type = 'table'", (q) => q.values()).map((r) => r[0]));
     for (const t of TABLES_ATTENDUES) {
       if (!tables.has(t)) throw new Error("La sauvegarde ne contient pas une base Le Moustachotron.");
     }

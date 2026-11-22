@@ -3,6 +3,7 @@
  * et la fiche entière avant et après (la preuve de ce qui a changé).
  */
 import { baseCourante } from "./base";
+import { requete } from "./requete";
 import { enrichir, LIENS_JOURNAL, TABLES_SUIVIES } from "./modele";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -33,7 +34,7 @@ type Ligne = Record<string, unknown>;
 export function instantane(id: string): (Ligne & { table: string }) | null {
   const base = baseCourante();
   for (const table of TABLES_SUIVIES) {
-    const ligne = base.query<Ligne, [string]>(`SELECT * FROM ${table} WHERE id = ?`).get(id);
+    const ligne = requete(base, `SELECT * FROM ${table} WHERE id = ?`, (q) => q.get(id) as Ligne | null);
     if (!ligne) continue;
     enrichir(base, table, ligne);
     return { table, ...ligne };
@@ -45,9 +46,8 @@ export function journaliser(utilisateur: string, fonction: string, args: unknown
   try {
     const cible = cibleDe(args, resultat);
     const apres = cible ? instantane(cible) : null;
-    baseCourante()
-      .query("INSERT INTO journal (quand, utilisateur, fonction, cible, resume, avant, apres) VALUES (?, ?, ?, ?, ?, ?, ?)")
-      .run(
+    requete(baseCourante(), "INSERT INTO journal (quand, utilisateur, fonction, cible, resume, avant, apres) VALUES (?, ?, ?, ?, ?, ?, ?)", (q) =>
+      q.run(
         new Date().toISOString(),
         utilisateur,
         fonction,
@@ -55,7 +55,8 @@ export function journaliser(utilisateur: string, fonction: string, args: unknown
         resumeDe(args),
         avant ? JSON.stringify(avant) : null,
         apres ? JSON.stringify(apres) : null,
-      );
+      ),
+    );
   } catch (e) {
     // Le journal ne doit jamais faire échouer l'écriture elle-même.
     console.error("Journal :", e);
@@ -96,7 +97,9 @@ export function lireJournal(f: { utilisateur?: string; depuis?: string; avant?: 
     params.push(f.cible, ...liens.map(() => f.cible!));
   }
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-  return baseCourante()
-    .query<LigneJournal, (string | number)[]>(`SELECT id, quand, utilisateur, fonction, cible, resume, avant, apres FROM journal ${where} ORDER BY id DESC LIMIT 200`)
-    .all(...params);
+  return requete(
+    baseCourante(),
+    `SELECT id, quand, utilisateur, fonction, cible, resume, avant, apres FROM journal ${where} ORDER BY id DESC LIMIT 200`,
+    (q) => q.all(...params) as LigneJournal[],
+  );
 }

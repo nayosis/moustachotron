@@ -5,6 +5,7 @@
  * Le reste de serveur/ (comptes, journal, traçabilité, sauvegardes, événements) est générique.
  */
 import type { Database } from "bun:sqlite";
+import { requete } from "./requete";
 
 /** Fonctions de src/data/ qui ne modifient rien. Toute autre fonction exposée est une écriture (sûr par défaut). */
 export const LECTURES = [
@@ -72,23 +73,23 @@ export const LIENS_JOURNAL = ["projet_id", "lot_id", "contact_id", "client_id", 
 export function enrichir(base: Database, table: string, ligne: Record<string, unknown>) {
   const id = String(ligne.id);
   if (table === "projet") {
-    ligne.jalons = base.query("SELECT code, date_prevue, date_reelle FROM jalon WHERE projet_id = ? ORDER BY code").all(id);
-    ligne.lots = base.query("SELECT id, numero, corps_etat, entreprise_id, tva_pb, commission_pb, montant_ttc, archive FROM lot WHERE projet_id = ? ORDER BY numero").all(id);
-    ligne.documents = base.query("SELECT id, type, nom, fichier, archive FROM document WHERE projet_id = ? ORDER BY cree_le").all(id);
-    ligne.echeances = base.query("SELECT code, lot_id, libelle, ttc, ht, statut, numero_facture, archive FROM echeance WHERE projet_id = ? ORDER BY code").all(id);
+    ligne.jalons = requete(base, "SELECT code, date_prevue, date_reelle FROM jalon WHERE projet_id = ? ORDER BY code", (q) => q.all(id));
+    ligne.lots = requete(base, "SELECT id, numero, corps_etat, entreprise_id, tva_pb, commission_pb, montant_ttc, archive FROM lot WHERE projet_id = ? ORDER BY numero", (q) => q.all(id));
+    ligne.documents = requete(base, "SELECT id, type, nom, fichier, archive FROM document WHERE projet_id = ? ORDER BY cree_le", (q) => q.all(id));
+    ligne.echeances = requete(base, "SELECT code, lot_id, libelle, ttc, ht, statut, numero_facture, archive FROM echeance WHERE projet_id = ? ORDER BY code", (q) => q.all(id));
   }
   if (table === "visite") {
-    ligne.presences = base.query("SELECT role, representant, etat, convoque, diffusion FROM presence WHERE visite_id = ? ORDER BY ordre").all(id);
-    ligne.points = base.query("SELECT lot_id, avancement, suivi, constats, observations FROM point_lot WHERE visite_id = ?").all(id);
-    ligne.documents = base.query("SELECT id, type, nom, fichier, archive FROM document WHERE visite_id = ? ORDER BY cree_le").all(id);
+    ligne.presences = requete(base, "SELECT role, representant, etat, convoque, diffusion FROM presence WHERE visite_id = ? ORDER BY ordre", (q) => q.all(id));
+    ligne.points = requete(base, "SELECT lot_id, avancement, suivi, constats, observations FROM point_lot WHERE visite_id = ?", (q) => q.all(id));
+    ligne.documents = requete(base, "SELECT id, type, nom, fichier, archive FROM document WHERE visite_id = ? ORDER BY cree_le", (q) => q.all(id));
   }
   if (table === "mouvement") {
-    ligne.documents = base.query("SELECT id, type, nom, fichier, archive FROM document WHERE mouvement_id = ? ORDER BY cree_le").all(id);
+    ligne.documents = requete(base, "SELECT id, type, nom, fichier, archive FROM document WHERE mouvement_id = ? ORDER BY cree_le", (q) => q.all(id));
   }
   if (table === "lot") {
-    ligne.devis = base.query("SELECT id, entreprise_id, reference, version, date, montant_ttc, statut, archive FROM devis WHERE lot_id = ? ORDER BY date").all(id);
+    ligne.devis = requete(base, "SELECT id, entreprise_id, reference, version, date, montant_ttc, statut, archive FROM devis WHERE lot_id = ? ORDER BY date", (q) => q.all(id));
   }
   if (table === "contact") {
-    ligne.documents = base.query("SELECT id, type, nom, fichier, valide_jusqu_au, archive FROM document WHERE contact_id = ? ORDER BY cree_le").all(id);
+    ligne.documents = requete(base, "SELECT id, type, nom, fichier, valide_jusqu_au, archive FROM document WHERE contact_id = ? ORDER BY cree_le", (q) => q.all(id));
   }
 }
